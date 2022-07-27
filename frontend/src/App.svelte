@@ -1,30 +1,40 @@
 <script lang="ts">
-	export let name: string;
+    import { Router, Route, Link } from "svelte-navigator";
+    import Teams from "./pages/Teams.svelte";
+    import Home from "./pages/Home.svelte";
+    import TopBar from "./components/TopBar.svelte";
+    import SideBar from "./components/SideBar.svelte";
+
+    export let showSide = false;
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
+<Router>
+    <header>
+        <div class="topBarContainer">
+            <TopBar bind:showSide />
+            <SideBar bind:show={showSide} />
+        </div>
+    </header>
+    <main>
+        <Route path="/">
+            <Home />
+        </Route>
+        <Route path="teams">
+            <Teams />
+        </Route>
+    </main>
+</Router>
 
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+    main {
+        margin: 1%;
+        margin-top: 0;
+        height: 100%;
+        z-index: 99999;
+    }
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+    .topBarContainer {
+        top: 0;
+        margin-top: 0;
+    }
 </style>
