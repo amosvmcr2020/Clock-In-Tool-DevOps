@@ -27,6 +27,10 @@ class Team(BaseModel):
 
 db = SessionLocal()
 
+@app.get('/')
+def responding():
+    return "API is responding"
+
 # User endpoints ------------------
 
 @app.get('/users', response_model=List[User], status_code=status.HTTP_200_OK)
@@ -93,6 +97,11 @@ def delete_user(user_id:int):
 def get_teams():
     teams = db.query(models.Team).all()
     return teams
+
+@app.get('/team/{team_id}', response_model=Team, status_code=status.HTTP_200_OK)
+def get_team(team_id:int):
+    team = db.query(models.Team).filter(models.Team.id == team_id).first()
+    return team
 
 @app.post('/team', response_model=Team, status_code=status.HTTP_201_CREATED)
 def create_team(team:Team): 
