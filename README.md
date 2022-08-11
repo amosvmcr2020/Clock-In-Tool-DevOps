@@ -8,3 +8,6 @@
 `python3 create_db.py`
 # Running the API
 `uvicorn main:app --reload`
+
+# Running the UI
+`npm start`
