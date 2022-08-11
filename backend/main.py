@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -38,6 +39,17 @@ class Team(BaseModel):
 
     class Config: 
         orm_mode = True
+
+class Timesheet(BaseModel): 
+    id: int
+
+    class Config: 
+        orm_mode = True
+
+class Entry(BaseModel):
+    id: int
+    time_in: datetime
+    time_out: datetime
 
 db = SessionLocal()
 
@@ -158,3 +170,8 @@ def delete_team(team_id:int):
 
     return(team)
     
+# Timesheet endpoints ------------------
+
+
+
+# Entry endpoints ------------------
