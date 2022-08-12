@@ -1,5 +1,5 @@
 from database import Base, engine
-from models import User, Team
+from models import User, Team, Entry, Timesheet
 
 print("Dropping existing database...")
 Base.metadata.drop_all(engine)
