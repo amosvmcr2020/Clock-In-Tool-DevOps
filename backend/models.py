@@ -46,7 +46,7 @@ class Entry(Base):
 
     time_in = Column(DateTime, nullable=False)
     time_out = Column(DateTime, nullable=True)
-    timesheetID = Column(int, ForeignKey("timesheets.id"), nullable=False)
+    timesheetID = Column(Integer, ForeignKey("timesheets.id"), nullable=False)
 
     timesheet = relationship(
         "Timesheet", back_populates="times", uselist=False)

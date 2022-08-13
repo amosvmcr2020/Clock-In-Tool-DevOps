@@ -109,7 +109,12 @@ def create_user(user: User):
         teamID=user.teamID
     )
 
+    new_timesheet = models.Timesheet(
+        owner=new_user,
+    )
+
     db.add(new_user)
+    db.add(new_timesheet)
     db.commit()
 
     return new_user
@@ -258,7 +263,7 @@ def get_entry(entry_id: int):
     return (entry)
 
 
-@app.post("/clock-in", response_model=models.Entry, status_code=status.HTTP_202_ACCEPTED)
+@app.post("/clock-in", response_model=Entry, status_code=status.HTTP_202_ACCEPTED)
 def clock_in(entry: Entry):
     if entry.time_in is None:
         raise HTTPException(
@@ -284,7 +289,7 @@ def clock_in(entry: Entry):
     return new_entry
 
 
-@app.put("/clock-out", response_model=models.Entry, status_code=status.HTTP_200_OK)
+@app.put("/clock-out", response_model=Entry, status_code=status.HTTP_200_OK)
 def clock_out(new_entry: Entry):
     if entry.time_out is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
