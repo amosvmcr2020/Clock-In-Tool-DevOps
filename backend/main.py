@@ -46,18 +46,26 @@ class Team(BaseModel):
 
 
 class Entry(BaseModel):
-    id: int
-    # date: str
+    id: Optional[int]
+    date: Optional[str]
+
     time_in: Optional[datetime]
     time_out: Optional[datetime]
+
     timesheetID: int
 
     class Config:
         orm_mode = True
 
 
+class Clock_req(BaseModel):
+    millis_in: Optional[int]
+    millis_out: Optional[int]
+    timesheetID: int
+
+
 class Timesheet(BaseModel):
-    id: int
+    id: Optional[int]
     owner: User
     times: Optional[List[Entry]]
 
@@ -118,6 +126,24 @@ def create_user(user: User):
     db.commit()
 
     return new_user
+
+
+@app.get('/user/{user_id}/timesheet', response_model=int, status_code=status.HTTP_200_OK)
+def get_user_timesheet(user_id: int):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User does not exist.")
+
+    timesheet = db.query(models.Timesheet).filter(
+        models.Timesheet.owner == user).first()
+    if timesheet is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User does not have a timesheet."
+        )
+    timesheet_id = timesheet.id
+    return timesheet_id
 
 
 @app.put('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
@@ -227,6 +253,8 @@ def get_timesheet(timesheet_id: int):
             status_code=status.HTTP_404_NOT_FOUND, detail="Timesheet not found.")
     return timesheet
 
+# Is this still needed?
+
 
 @app.post("/timesheet", response_model=Timesheet, status_code=status.HTTP_202_ACCEPTED)
 def create_timesheet(timesheet: Timesheet, ):
@@ -264,21 +292,26 @@ def get_entry(entry_id: int):
 
 
 @app.post("/clock-in", response_model=Entry, status_code=status.HTTP_202_ACCEPTED)
-def clock_in(entry: Entry):
-    if entry.time_in is None:
+def clock_in(entry: Clock_req):
+    if entry.millis_in:
+        time_in = datetime.fromtimestamp(entry.millis_in/1000.0)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No clock-in time provided")
+    if time_in is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No clock-in time provided")
     timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.id == entry.timesheetID).first()
-    date = entry.time_in.strftime("%x")
+    date = time_in.strftime("%x")
     # serach for clock-in date in existing records
-    if re.search('"date": {date}', json.dumps(timesheet.times), re.M):
+    if any(entry.date == date for entry in timesheet.times):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="You have already clocked in today.")
 
     new_entry = models.Entry(
         date=date,
-        time_in=entry.time_in,
+        time_in=time_in,
         time_out=None,
         timesheetID=entry.timesheetID
     )
@@ -290,20 +323,31 @@ def clock_in(entry: Entry):
 
 
 @app.put("/clock-out", response_model=Entry, status_code=status.HTTP_200_OK)
-def clock_out(new_entry: Entry):
-    if entry.time_out is None:
+def clock_out(new_entry: Clock_req):
+
+    if new_entry.millis_out:
+        time_out = datetime.fromtimestamp(
+            new_entry.millis_out/1000.0)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No clock-out time provided")
+    if time_out is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="No clock-out time provided")
 
-    entry = db.query(models.Entry).filter(models.Entry.date ==
-                                          new_entry.time_out.strftime("%x")).first()
+    entry = db.query(models.Entry).filter(models.Entry.timesheetID == new_entry.timesheetID).filter(
+        models.Entry.date == time_out.strftime("%x")).first()
+
+    if entry is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="You have not clocked in today.")
 
     # If time_out already exists
     if entry.time_out is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="You have already clocked out today.")
 
-    entry.time_out = new_entry.time_out
+    entry.time_out = time_out
 
     db.commit()
 
