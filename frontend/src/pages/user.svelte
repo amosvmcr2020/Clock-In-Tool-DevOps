@@ -1,9 +1,11 @@
 <script>
     import axios from "axios";
+    import { get } from "svelte/store";
     let showModal = false;
     let login = true;
 
     let user_list = [];
+    let team_list = [];
     console.log(user_list);
 
     const get_users = async () => {
@@ -12,11 +14,18 @@
             .then((res) => (user_list = res.data));
     };
 
-    const toggleModal = () => {
+    const get_teams = async () => {
+        await axios
+            .get(`http://localhost:8000/teams`)
+            .then((res) => (team_list = res.data));
+    };
+
+    const toggleModal = async () => {
+        await get_teams();
         showModal = !showModal;
     };
 
-    const toggleLogin = () => {
+    const toggleLogin = async () => {
         login = !login;
     };
 
@@ -116,9 +125,9 @@
 
                         <label for="teamname">Team Name</label>
                         <select name="teamname" id="teamname">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
+                            {#each team_list as team}
+                                <option value={team.id}>{team.teamname}</option>
+                            {/each}
                         </select>
 
                         <input class="end" type="submit" value="Submit" />

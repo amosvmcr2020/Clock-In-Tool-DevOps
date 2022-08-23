@@ -4,20 +4,25 @@
 
 	import Teams from "./pages/Teams.svelte";
 	import TopBar from "./components/TopBar.svelte";
-	import Clocks from "./pages/clocks.svelte";
+	import ClockIn from "./pages/clock-in.svelte";
 	import User from "./pages/user.svelte";
+	import Clock from "./components/clock.svelte";
+	import Warning from "./components/warning.svelte";
 </script>
 
 <Router primary={false}>
 	<TopBar />
 	<Route path="/">
 		<div class="page">
-			<h1>Hello {name}!</h1>
-			<p>
-				Visit the <a href="https://svelte.dev/tutorial"
-					>Svelte tutorial</a
-				> to learn how to build Svelte apps.
-			</p>
+			<div class="page-title">Hello {name}!</div>
+			<div class="clock-container">
+				<Clock type="in" />
+				<Clock type="out" />
+			</div>
+			<br />
+			<div>
+				<Warning>Hello</Warning>
+			</div>
 		</div>
 	</Route>
 	<Route path="user">
@@ -27,11 +32,17 @@
 		<Teams />
 	</Route>
 	<Route path="/clocks">
-		<Clocks />
+		<ClockIn />
 	</Route>
 </Router>
 
 <style>
+	.clock-container {
+		display: flex;
+		flex-direction: row;
+		gap: 200px;
+		justify-content: center;
+	}
 	h1 {
 		color: #ff3e00;
 		text-transform: uppercase;

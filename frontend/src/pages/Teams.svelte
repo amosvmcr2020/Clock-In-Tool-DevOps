@@ -14,15 +14,32 @@
     <div class="content-container">
         <div class="container-title">Teams</div>
         <div class="content">
-            <div class="selection-box">Select</div>
             <button on:click={() => get_teams()}> Get Teams </button>
+
             {#each team_list as team}
-                <p>{team.teamname}:</p>
-                <ul>
+                <div class="team-header">
+                    {team.teamname}
+                </div>
+                <table>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                    </tr>
                     {#each team.users as user}
-                        <li>{user.username}</li>
+                        <tr>
+                            <td>
+                                {user.username}
+                            </td>
+                            <td>
+                                {#if user.hasAdmin}
+                                    Admin
+                                {:else}
+                                    User
+                                {/if}
+                            </td>
+                        </tr>
                     {/each}
-                </ul>
+                </table>
             {/each}
         </div>
     </div>
@@ -32,5 +49,29 @@
     .selection-box {
         width: 100%;
         background-color: #333;
+    }
+
+    .team-header {
+        margin: 20px;
+        color: var(--text);
+        text-transform: capitalize;
+        font-size: 32px;
+        font-weight: 100;
+    }
+
+    table {
+        display: flex;
+        width: 80%;
+        flex-direction: column;
+        gap: 20px;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    td {
+        padding-left: 60px;
+    }
+    th {
+        padding-left: 30px;
     }
 </style>
