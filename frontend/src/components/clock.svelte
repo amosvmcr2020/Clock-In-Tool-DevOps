@@ -15,7 +15,7 @@
     const clock_out = async () => {
         let curr_time = Date.now();
         // This needs to be set to the current user - Global?
-        let userID = 2;
+        let userID = 3;
 
         try {
             let timesheet_id = await get_timesheet_id(userID);
@@ -25,16 +25,18 @@
                     millis_out: curr_time,
                     timesheetID: timesheet_id,
                 })
-                .then((res) => (response = res.data));
+                .then(
+                    () => (response = ["Success", "Clocked out successfully!"])
+                );
         } catch (error) {
-            response = error.response.data.detail;
+            response = ["Error", error.response.data.detail];
         }
     };
 
     const clock_in = async () => {
         let curr_time = Date.now();
         // This needs to be set to the current user - Global?
-        let userID = 2;
+        let userID = 3;
 
         let timesheet_id = await get_timesheet_id(userID);
 
@@ -44,9 +46,12 @@
                     millis_in: curr_time,
                     timesheetID: timesheet_id,
                 })
-                .then((res) => (response = res.data));
+                .then(
+                    (res) =>
+                        (response = ["Success", "Clocked in successfully!"])
+                );
         } catch (error) {
-            response = error.response.data.detail;
+            response = ["Error", error.response.data.detail];
         }
     };
 
@@ -70,8 +75,8 @@
             {/if}
             <div class="center" />
         </div>
-        <div class="arrow top" />
-        <div class="arrow bottom" />
+        <!-- <div class="arrow top" />
+        <div class="arrow bottom" /> -->
     </div>
     <h1>
         {#if type == "in"}

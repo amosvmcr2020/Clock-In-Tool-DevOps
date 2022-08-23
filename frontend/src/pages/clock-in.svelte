@@ -1,7 +1,7 @@
 <script>
     import Clock from "../components/clock.svelte";
     import Warning from "../components/warning.svelte";
-    let response;
+    let response = [];
 </script>
 
 <div class="page">
@@ -12,9 +12,14 @@
         <Clock bind:response type="in" />
         <Clock bind:response type="out" />
     </div>
-    {#if response}
+    {#if response[0] == "Error"}
         <div class="warning-container">
-            <Warning>{response}</Warning>
+            <Warning>{response[1]}</Warning>
+        </div>
+    {:else if response[0] == "Success"}
+        <div style="color: --text;">
+            <!-- TODO: Add a success component -->
+            {response[1]}
         </div>
     {/if}
 </div>
