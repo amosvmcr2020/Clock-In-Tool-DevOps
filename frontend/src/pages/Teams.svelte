@@ -4,7 +4,7 @@
     let team_list = [];
     const get_teams = async () => {
         await axios
-            .get(`http://localhost:8000/teams`)
+            .get(`http://localhost:8000/team`)
             .then((res) => (team_list = res.data));
     };
 </script>
@@ -46,11 +46,6 @@
 </div>
 
 <style>
-    .selection-box {
-        width: 100%;
-        background-color: #333;
-    }
-
     .team-header {
         margin: 20px;
         color: var(--text);

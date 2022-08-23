@@ -10,13 +10,13 @@
 
     const get_users = async () => {
         await axios
-            .get(`http://localhost:8000/users`)
+            .get(`http://localhost:8000/user`)
             .then((res) => (user_list = res.data));
     };
 
     const get_teams = async () => {
         await axios
-            .get(`http://localhost:8000/teams`)
+            .get(`http://localhost:8000/team`)
             .then((res) => (team_list = res.data));
     };
 
