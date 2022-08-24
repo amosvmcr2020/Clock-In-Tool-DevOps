@@ -6,6 +6,7 @@
         await axios
             .get(`http://localhost:8000/team`)
             .then((res) => (team_list = res.data));
+        return team_list;
     };
 </script>
 
@@ -14,33 +15,37 @@
     <div class="content-container">
         <div class="container-title">Teams</div>
         <div class="content">
-            <button on:click={() => get_teams()}> Get Teams </button>
-
-            {#each team_list as team}
-                <div class="team-header">
-                    {team.teamname}
-                </div>
-                <table>
-                    <tr>
-                        <th>Username</th>
-                        <th>Role</th>
-                    </tr>
-                    {#each team.users as user}
+            {#await get_teams()}
+                Loading...
+            {:then team_list}
+                {#each team_list as team}
+                    <div class="team-header">
+                        {team.teamname}
+                    </div>
+                    <table>
                         <tr>
-                            <td>
-                                {user.username}
-                            </td>
-                            <td>
-                                {#if user.hasAdmin}
-                                    Admin
-                                {:else}
-                                    User
-                                {/if}
-                            </td>
+                            <th>Username</th>
+                            <th>Role</th>
                         </tr>
-                    {/each}
-                </table>
-            {/each}
+                        <tbody>
+                            {#each team.users as user}
+                                <tr>
+                                    <td>
+                                        {user.username}
+                                    </td>
+                                    <td>
+                                        {#if user.hasAdmin}
+                                            Admin
+                                        {:else}
+                                            User
+                                        {/if}
+                                    </td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                    </table>
+                {/each}
+            {/await}
         </div>
     </div>
 </div>
@@ -55,18 +60,6 @@
     }
 
     table {
-        display: flex;
-        width: 80%;
-        flex-direction: column;
-        gap: 20px;
-        justify-content: center;
-        align-items: flex-start;
-    }
-
-    td {
-        padding-left: 60px;
-    }
-    th {
-        padding-left: 30px;
+        text-align: center;
     }
 </style>

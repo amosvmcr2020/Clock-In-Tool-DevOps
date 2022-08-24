@@ -13,17 +13,7 @@
 <Router primary={false}>
 	<TopBar />
 	<Route path="/">
-		<div class="page">
-			<div class="page-title">Hello {name}!</div>
-			<div class="clock-container">
-				<Clock type="in" />
-				<Clock type="out" />
-			</div>
-			<br />
-			<div>
-				<Warning>Hello</Warning>
-			</div>
-		</div>
+		<Home />
 	</Route>
 	<Route path="user">
 		<User />

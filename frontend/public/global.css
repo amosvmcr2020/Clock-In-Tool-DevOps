@@ -17,7 +17,8 @@ body {
 :root {
 	--primary: #242333;
 	--secondary: #01B0D3;
-	--alt-seccondary: #2dc7e5;
+	--midpoint: #136A83;
+	--alt-secondary: #2dc7e5;
 	--ternary: #ffe26a;
 	--accent: #bebebe;
 	--text: #FFFFFF;
@@ -118,6 +119,30 @@ input[type=submit] {
 
 button:hover,
 input[type=submit] {
-	background: var(--alt-seccondary);
+	background: var(--alt-secondary);
 	transition: 0.5s;
+}
+
+table {
+	color: var(--text);
+	text-align: center;
+	width: 100%;
+}
+
+table tr {
+	border-bottom: 1px solid #dddddd;
+}
+
+table td {
+	padding: 10px;
+}
+
+table tbody tr:nth-of-type(odd) {
+	background-color: var(--secondary);
+	color: var(--primary);
+}
+
+table tbody tr:hover {
+	background: var(--midpoint);
+	transition: 0.2s;
 }
