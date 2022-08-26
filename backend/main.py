@@ -1,12 +1,9 @@
 from datetime import datetime
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, Depends, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
 from schemas import *
-
-import re
-import json
 
 from database import SessionLocal
 import models
@@ -30,6 +27,11 @@ app.add_middleware(
 db = SessionLocal()
 
 
+def hash(password):
+    hashed_password = password
+    return hashed_password
+
+
 @app.get('/')
 def responding():
     return "API is responding"
@@ -37,7 +39,7 @@ def responding():
 # User endpoints ------------------
 
 
-@app.get('/users', response_model=List[User], status_code=status.HTTP_200_OK)
+@app.get('/user', response_model=List[User], status_code=status.HTTP_200_OK)
 def get_users():
     users = db.query(models.User).all()
     return users
@@ -52,7 +54,12 @@ def get_user(user_id: int):
 
 
 @app.post('/user', response_model=User, status_code=status.HTTP_201_CREATED)
-def create_user(user: User):
+def create_user(user: UserIn):
+
+    if user.username == "":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Username cannot be empty")
+
     check_user = db.query(models.User).filter(
         models.User.username == user.username).first()
     check_team = db.query(models.Team).filter(
@@ -67,6 +74,7 @@ def create_user(user: User):
 
     new_user = models.User(
         username=user.username,
+        hashed_password=hash(user.password),
         hasAdmin=user.hasAdmin,
         teamID=user.teamID
     )
@@ -100,6 +108,22 @@ def get_user_timesheet(user_id: int):
     return timesheet_id
 
 
+@app.get('/user/{user_id}/timesheet/summary', response_model=Timesheet, status_code=status.HTTP_200_OK)
+def get_user_timesheet(user_id: int):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User does not exist.")
+
+    timesheet = db.query(models.Timesheet).filter(
+        models.Timesheet.owner == user).first()
+    if timesheet is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User does not have a timesheet."
+        )
+    return timesheet
+
+
 @app.put('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
 def update_user(user_id: int, new_user: User):
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -125,9 +149,32 @@ def delete_user(user_id: int):
     return (user)
 
 
+@app.get('/id/username/{username}', response_model=int, status_code=status.HTTP_200_OK)
+def get_user_id(username: str):
+    user = db.query(models.User).filter(
+        models.User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User does not exist")
+    return user.id
+
+
+@app.post('/login', status_code=status.HTTP_200_OK)
+def user_login(user: UserLogin):
+    check_user = db.query(models.User).filter(
+        models.User.username == user.username).first()
+    if check_user is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Username or password is incorrect.")
+    if user.password == check_user.hashed_password:
+        return check_user.id
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Username or password is incorrect.")
+
+
 # Team endpoints ------------------
 
-@app.get('/teams', response_model=List[Team], status_code=status.HTTP_200_OK)
+
+@app.get('/team', response_model=List[Team], status_code=status.HTTP_200_OK)
 def get_teams():
     teams = db.query(models.Team).all()
     return teams
@@ -144,6 +191,11 @@ def get_team(team_id: int):
 
 @app.post('/team', response_model=Team, status_code=status.HTTP_201_CREATED)
 def create_team(team: Team):
+
+    if team.teamname == "":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Team name cannot be empty")
+
     check_team = db.query(models.Team).filter(
         models.Team.teamname == team.teamname).first()
 
@@ -192,7 +244,7 @@ def delete_team(team_id: int):
 # Timesheet endpoints ------------------
 
 
-@app.get("/timesheets", response_model=List[Timesheet], status_code=status.HTTP_200_OK)
+@app.get("/timesheet", response_model=List[Timesheet], status_code=status.HTTP_200_OK)
 def get_timesheets():
     timesheets = db.query(models.Timesheet).all()
     return timesheets
@@ -205,6 +257,16 @@ def get_timesheet(timesheet_id: int):
     if timesheet is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Timesheet not found.")
+    return timesheet
+
+
+@app.get("/timesheet/user/{user_id}", response_model=Timesheet)
+def get_user_timesheet(user_id: int):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+    timesheet = user.timesheet
     return timesheet
 
 # Is this still needed?
@@ -230,7 +292,7 @@ def create_timesheet(timesheet: Timesheet, ):
 # Entry endpoints ------------------
 
 
-@app.get("/entries", response_model=List[Entry], status_code=status.HTTP_200_OK)
+@app.get("/entry", response_model=List[Entry], status_code=status.HTTP_200_OK)
 def get_entries():
     entries = db.query(models.Entry).all()
     return entries
@@ -306,3 +368,12 @@ def clock_out(new_entry: Clock_req):
     db.commit()
 
     return entry
+
+
+@app.get('/check/{username}', response_model=bool, status_code=status.HTTP_200_OK)
+def check_username(username: str):
+    user = db.query(models.User).filter(
+        models.User.username == username).first()
+    if user is None:
+        return False
+    return True

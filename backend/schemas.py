@@ -13,6 +13,25 @@ class User(BaseModel):
         orm_mode = True
 
 
+class UserIn(BaseModel):
+    username: str
+    password: str
+    hasAdmin: bool
+    teamID: int
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    hasAdmin: bool
+    teamID: int
+
+
 class Team(BaseModel):
     id: Optional[int]
     teamname: str

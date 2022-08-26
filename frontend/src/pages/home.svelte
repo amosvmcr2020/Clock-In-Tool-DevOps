@@ -1,5 +1,7 @@
 <script>
     import axios from "axios";
+    import { get } from "svelte/store";
+    import { current_user_id } from "../store";
 
     let user;
     let times = [];
@@ -13,17 +15,10 @@
 
     const get_current_user = async () => {
         await axios
-            .get(`http://localhost:8000/user`)
-            .then((res) => (user = res.data[1]));
+            .get(`http://localhost:8000/user/${get(current_user_id)}`)
+            .then((res) => (user = res.data));
         return user;
     };
-
-    // const get_current_user = async () => {
-    //     await axios
-    //         .get(`http://localhost:8000/user/${user_id}`)
-    //         .then((res) => (user = res.data));
-    //     return user;
-    // };
 
     const translate_date = (date_str) => {
         let date = new Date(date_str);

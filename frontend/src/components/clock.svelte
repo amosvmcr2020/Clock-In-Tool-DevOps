@@ -1,7 +1,11 @@
 <script>
     export let type;
     import axios from "axios";
+    import { get } from "svelte/store";
+    import { current_user_id } from "../store";
     export let response;
+
+    let userID = get(current_user_id);
 
     const get_timesheet_id = async (userID) => {
         let id;
@@ -13,45 +17,56 @@
     };
 
     const clock_out = async () => {
-        let curr_time = Date.now();
-        // This needs to be set to the current user - Global?
-        let userID = 3;
+        if (userID != 0) {
+            let curr_time = Date.now();
+            // This needs to be set to the current user - Global?
 
-        try {
-            let timesheet_id = await get_timesheet_id(userID);
+            try {
+                let timesheet_id = await get_timesheet_id(userID);
 
-            await axios
-                .put(`http://localhost:8000/clock-out`, {
-                    millis_out: curr_time,
-                    timesheetID: timesheet_id,
-                })
-                .then(
-                    () => (response = ["Success", "Clocked out successfully!"])
-                );
-        } catch (error) {
-            response = ["Error", error.response.data.detail];
+                await axios
+                    .put(`http://localhost:8000/clock-out`, {
+                        millis_out: curr_time,
+                        timesheetID: timesheet_id,
+                    })
+                    .then(
+                        () =>
+                            (response = [
+                                "Success",
+                                "Clocked out successfully!",
+                            ])
+                    );
+            } catch (error) {
+                response = ["Error", error.response.data.detail];
+            }
+            return;
         }
+        response = ["Error", "Please log in to clock out."];
     };
 
     const clock_in = async () => {
-        let curr_time = Date.now();
-        // This needs to be set to the current user - Global?
-        let userID = 3;
+        if (userID != 0) {
+            let curr_time = Date.now();
+            // This needs to be set to the current user - Global?
 
-        let timesheet_id = await get_timesheet_id(userID);
+            let timesheet_id = await get_timesheet_id(userID);
 
-        try {
-            await axios
-                .post(`http://localhost:8000/clock-in`, {
-                    millis_in: curr_time,
-                    timesheetID: timesheet_id,
-                })
-                .then(
-                    () => (response = ["Success", "Clocked in successfully!"])
-                );
-        } catch (error) {
-            response = ["Error", error.response.data.detail];
+            try {
+                await axios
+                    .post(`http://localhost:8000/clock-in`, {
+                        millis_in: curr_time,
+                        timesheetID: timesheet_id,
+                    })
+                    .then(
+                        () =>
+                            (response = ["Success", "Clocked in successfully!"])
+                    );
+            } catch (error) {
+                response = ["Error", error.response.data.detail];
+            }
+            return;
         }
+        response = ["Error", "Please log in to clock in."];
     };
 
     const triggerFunc = (type) => {
