@@ -2,9 +2,13 @@
     import axios from "axios";
     import { get } from "svelte/store";
     import { current_user_id } from "../store";
+    import { Link } from "svelte-navigator";
+    import ClockIn from "./clock-in.svelte";
 
     let user;
     let times = [];
+
+    export let alerts;
 
     const get_timesheet = async (user_id) => {
         await axios
@@ -21,6 +25,9 @@
     };
 
     const translate_date = (date_str) => {
+        if (date_str == null) {
+            return "";
+        }
         let date = new Date(date_str);
         date = date.toLocaleTimeString();
         return date;
@@ -28,32 +35,42 @@
 </script>
 
 <div class="page">
-    {#await get_current_user()}
-        Loading
-    {:then user}
-        <div class="page-title">Hello {user.username}!</div>
-        {#await get_timesheet(user.id)}
+    {#if get(current_user_id) == 0}
+        <div class="page-title">Hello!</div>
+        <div class="msgContainer">
+            <p>You are not currently logged in. Please log in</p>
+            <Link to="/user">here</Link>
+        </div>
+    {:else}
+        {#await get_current_user()}
             Loading
-        {:then times}
-            <h3>Have a look at your times below:</h3>
-            <table>
-                <tr>
-                    <th>Date</th>
-                    <th>Time In</th>
-                    <th>Time Out</th>
-                </tr>
-                <tbody>
-                    {#each times as entry}
-                        <tr>
-                            <td>{entry.date}</td>
-                            <td>{translate_date(entry.time_in)}</td>
-                            <td>{translate_date(entry.time_out)}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
+        {:then user}
+            <div class="page-title">Hello {user.username}!</div>
+            {#await get_timesheet(user.id)}
+                Loading
+            {:then times}
+                <ClockIn bind:alerts />
+                <h3>Have a look at your times below:</h3>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                    </tr>
+                    <tbody>
+                        {#each times as entry}
+                            <tr>
+                                <td>{entry.date}</td>
+                                <td>{translate_date(entry.time_in)}</td>
+
+                                <td>{translate_date(entry.time_out)}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/await}
         {/await}
-    {/await}
+    {/if}
 </div>
 
 <style>
@@ -83,7 +100,16 @@
         transition: 0.2s;
     }
 
+    p,
     h3 {
         color: var(--text);
+    }
+
+    .msgContainer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
     }
 </style>
