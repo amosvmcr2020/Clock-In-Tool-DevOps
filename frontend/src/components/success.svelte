@@ -4,7 +4,7 @@
 
 <div class="warning-container">
     <div class="symbol">
-        <Icon class="symbol" icon="ant-design:warning-filled" />
+        <Icon icon="ep:success-filled" />
     </div>
     <slot />
 </div>
@@ -14,7 +14,8 @@
         margin: 1%;
         height: fit-content;
         border-radius: 10px;
-        background: var(--alt-danger);
+        background: var(--alt-success);
+        opacity: 1;
         display: flex;
         align-items: center;
         justify-content: flex-start;

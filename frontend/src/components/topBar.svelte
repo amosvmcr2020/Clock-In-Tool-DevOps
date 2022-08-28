@@ -5,7 +5,6 @@
 
     const logout = () => {
         current_user_id.update((val) => (val = 0));
-        console.log(get(current_user_id));
         window.location.reload();
     };
 </script>
