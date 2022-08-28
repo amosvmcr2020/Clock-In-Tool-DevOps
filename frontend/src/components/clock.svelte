@@ -3,7 +3,7 @@
     import axios from "axios";
     import { get } from "svelte/store";
     import { current_user_id } from "../store";
-    export let response;
+    export let alerts;
 
     let userID = get(current_user_id);
 
@@ -29,19 +29,18 @@
                         millis_out: curr_time,
                         timesheetID: timesheet_id,
                     })
-                    .then(
-                        () =>
-                            (response = [
-                                "Success",
-                                "Clocked out successfully!",
-                            ])
+                    .then(() =>
+                        alerts.push(["Success", "Clocked out successfully!"])
                     );
+                alerts = alerts;
             } catch (error) {
-                response = ["Error", error.response.data.detail];
+                alerts.push(["Error", error.response.data.detail]);
+                alerts = alerts;
             }
             return;
         }
-        response = ["Error", "Please log in to clock out."];
+        alerts.push(["Error", "Please log in to clock out."]);
+        alerts = alerts;
     };
 
     const clock_in = async () => {
@@ -57,16 +56,18 @@
                         millis_in: curr_time,
                         timesheetID: timesheet_id,
                     })
-                    .then(
-                        () =>
-                            (response = ["Success", "Clocked in successfully!"])
+                    .then(() =>
+                        alerts.push(["Success", "Clocked in successfully!"])
                     );
+                alerts = alerts;
             } catch (error) {
-                response = ["Error", error.response.data.detail];
+                alerts.push(["Error", error.response.data.detail]);
+                alerts = alerts;
             }
             return;
         }
-        response = ["Error", "Please log in to clock in."];
+        alerts.push(["Error", "Please log in to clock in."]);
+        alerts = alerts;
     };
 
     const triggerFunc = (type) => {

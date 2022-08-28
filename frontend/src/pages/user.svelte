@@ -1,25 +1,15 @@
 <script>
     import axios from "axios";
     import { get } from "svelte/store";
-    import Warning from "../components/warning.svelte";
 
     import { current_user_id } from "../store";
 
     console.log(get(current_user_id));
 
-    let response = [];
+    export let alerts = [];
 
     let showModal = false;
     let login = true;
-    let showAlert = false;
-    let timer;
-    $: if (response) {
-        clearTimeout(timer);
-        showAlert = true;
-        timer = setTimeout(() => {
-            showAlert = false;
-        }, 3000);
-    }
 
     let user_list = [];
     let team_list = [];
@@ -42,6 +32,7 @@
         await axios
             .get(`http://localhost:8000/team`)
             .then((res) => (team_list = res.data));
+        team_list = team_list;
     };
 
     const toggleModal = async () => {
@@ -71,10 +62,11 @@
                     .then((res) =>
                         current_user_id.update((val) => (val = res.data))
                     );
-                response = ["Success", "Logged in."];
+                alerts = alerts;
                 window.location.reload();
             } catch (error) {
-                response = ["Error", error.response.data.detail];
+                alerts.push(["Error", error.response.data.detail]);
+                alerts = alerts;
             }
         } else {
             await axios
@@ -125,13 +117,8 @@
             <button class="close" on:click={() => toggleModal()}>X</button>
             {#if login}
                 <div class="page-title">Log In</div>
-                {#if response[0]}
-                    {#if showAlert}
-                        <Warning>{response[1]}</Warning>
-                    {/if}
-                {/if}
-                <div class="form-container">
-                    <form on:submit|preventDefault={onSubmit}>
+                <div class="modalFormContainer">
+                    <form class="modalForm" on:submit|preventDefault={onSubmit}>
                         <label for="username">Username</label>
                         <input
                             type="text"
@@ -157,8 +144,8 @@
                 </div>
             {:else}
                 <div class="page-title">Create User</div>
-                <div class="form-container">
-                    <form on:submit|preventDefault={onSubmit}>
+                <div class="modalFormContainer">
+                    <form class="modalForm" on:submit|preventDefault={onSubmit}>
                         <label for="username">Username</label>
                         <input
                             type="text"
@@ -208,76 +195,11 @@
         gap: 5%;
     }
 
-    .modal-container {
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 110%;
-        position: absolute;
-        background: black;
-        opacity: 0.5;
-        animation: semifadein 0.5s;
-        -webkit-animation: semifadein 0.5s;
-    }
-    .modal-window {
-        top: 0;
-        left: 0;
-        transform: translate(20%, 20%);
-        width: 60%;
-        height: fit-content;
-        position: absolute;
-        background: var(--secondary);
-        border-radius: 20px;
-        padding: 5%;
-        animation: fadein 0.5s;
-        -webkit-animation: fadein 0.5s;
-    }
-    .close {
-        justify-self: end;
-        font-family: monospace;
-        float: right;
-        width: 30px;
-        height: 30px;
-    }
-
-    .form-container {
-        background: #ffffff;
-        width: 90%;
-        height: inherit;
-        padding: 5%;
-        border-radius: 20px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
     .end {
         align-self: end;
     }
 
     .bottom {
         padding-top: 10px;
-    }
-
-    @keyframes fadein {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    @keyframes semifadein {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 0.5;
-        }
     }
 </style>
