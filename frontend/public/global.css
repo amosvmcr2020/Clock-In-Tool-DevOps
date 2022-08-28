@@ -16,11 +16,15 @@ body {
 
 :root {
 	--primary: #242333;
+	--alt-primary: #333149;
 	--secondary: #01B0D3;
-	--alt-seccondary: #2dc7e5;
+	--midpoint: #136A83;
+	--alt-secondary: #2dc7e5;
 	--ternary: #ffe26a;
 	--accent: #bebebe;
 	--text: #FFFFFF;
+	--danger: #DC3545;
+	--alt-danger: #BC3545;
 	/* background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); */
 	background-color: var(--primary);
 }
@@ -114,10 +118,53 @@ input[type=submit] {
 	cursor: pointer;
 	overflow: hidden;
 	border-radius: 5px;
+	color: var(--text);
+}
+
+.deleteButton {
+	background: var(--danger);
+	height: 30px;
+	width: 30px;
+	font-size: 20px;
+	padding: 5px;
+}
+
+.deleteButton:hover {
+	background: var(--alt-danger);
+}
+
+input {
+	height: fit-content;
+	font-size: 16px;
+	padding: 1%;
 }
 
 button:hover,
-input[type=submit] {
-	background: var(--alt-seccondary);
+input[type=submit]:hover {
+	background: var(--alt-secondary);
 	transition: 0.5s;
+}
+
+table {
+	color: var(--text);
+	text-align: center;
+	width: 100%;
+}
+
+table tr {
+	border-bottom: 1px solid #dddddd;
+}
+
+table td {
+	padding: 10px;
+}
+
+table tbody tr:nth-of-type(odd) {
+	background-color: var(--secondary);
+	color: var(--primary);
+}
+
+table tbody tr:hover {
+	background: var(--midpoint);
+	transition: 0.2s;
 }

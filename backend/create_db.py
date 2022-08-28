@@ -1,4 +1,3 @@
-from backend.database import SessionLocal
 from database import Base, engine
 from models import User, Team, Entry, Timesheet
 

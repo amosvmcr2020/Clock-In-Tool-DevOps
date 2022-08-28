@@ -1,31 +1,22 @@
 <script>
-	export let name;
 	import { Router, Route } from "svelte-navigator";
 
+	import Home from "./pages/Home.svelte";
 	import Teams from "./pages/Teams.svelte";
 	import TopBar from "./components/TopBar.svelte";
 	import ClockIn from "./pages/clock-in.svelte";
 	import User from "./pages/user.svelte";
-	import Clock from "./components/clock.svelte";
-	import Warning from "./components/warning.svelte";
+
+	import { current_user_id } from "./store";
+	import { get } from "svelte/store";
 </script>
 
 <Router primary={false}>
 	<TopBar />
 	<Route path="/">
-		<div class="page">
-			<div class="page-title">Hello {name}!</div>
-			<div class="clock-container">
-				<Clock type="in" />
-				<Clock type="out" />
-			</div>
-			<br />
-			<div>
-				<Warning>Hello</Warning>
-			</div>
-		</div>
+		<Home />
 	</Route>
-	<Route path="user">
+	<Route bind:user_id={$current_user_id} path="user">
 		<User />
 	</Route>
 	<Route path="/team">
@@ -35,18 +26,3 @@
 		<ClockIn />
 	</Route>
 </Router>
-
-<style>
-	.clock-container {
-		display: flex;
-		flex-direction: row;
-		gap: 200px;
-		justify-content: center;
-	}
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-</style>

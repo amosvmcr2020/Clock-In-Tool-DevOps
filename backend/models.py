@@ -7,6 +7,7 @@ class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     username = Column(String(255), nullable=False, unique=True)
+    hashed_password = Column(String(255), nullable=False)
     hasAdmin = Column(Boolean, default=False)
     teamID = Column(Integer, ForeignKey("teams.id"), nullable=False)
     timesheetID = Column(Integer, ForeignKey("timesheets.id"), nullable=False)

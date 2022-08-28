@@ -1,5 +1,12 @@
 <script>
     import { Link } from "svelte-navigator";
+    import { get } from "svelte/store";
+    import { current_user_id } from "../store";
+
+    const logout = () => {
+        current_user_id.update((val) => (val = 0));
+        console.log(get(current_user_id));
+    };
 </script>
 
 <div class="topBar">
@@ -8,11 +15,11 @@
     <Link to="/user">User</Link>
     <Link to="/clocks">Clock-In</Link>
     <Link to="/team">Teams</Link>
+    <button class="logoutButton" on:click={() => logout()}> Log Out</button>
 </div>
 
 <style>
     .topBar {
-        position: absolute;
         width: 100%;
         height: 80px;
         position: fixed;
@@ -23,7 +30,7 @@
 
         box-shadow: 0.1px 0.1px 0.1px 1px #ffffff;
 
-        z-index: 999999;
+        z-index: 2;
 
         display: flex;
         align-items: center;
@@ -37,5 +44,13 @@
         font-size: 32px;
         padding: 20px;
         text-transform: uppercase;
+    }
+
+    .logoutButton {
+        background-color: var(--primary);
+        color: var(--text);
+    }
+    .logoutButton:hover {
+        background-color: var(--alt-primary);
     }
 </style>

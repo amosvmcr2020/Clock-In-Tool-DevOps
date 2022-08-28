@@ -1,22 +1,46 @@
 <script>
     import axios from "axios";
     import { get } from "svelte/store";
+    import Warning from "../components/warning.svelte";
+
+    import { current_user_id } from "../store";
+
+    console.log(get(current_user_id));
+
+    let response = [];
+
     let showModal = false;
     let login = true;
+    let showAlert = false;
+    let timer;
+    $: if (response) {
+        clearTimeout(timer);
+        showAlert = true;
+        timer = setTimeout(() => {
+            showAlert = false;
+        }, 3000);
+    }
 
     let user_list = [];
     let team_list = [];
-    console.log(user_list);
+
+    const get_user = async (user_id) => {
+        let user;
+        await axios
+            .get(`http://localhost:8000/user/${user_id}`)
+            .then((res) => (user = res.data));
+        return user;
+    };
 
     const get_users = async () => {
         await axios
-            .get(`http://localhost:8000/users`)
+            .get(`http://localhost:8000/user`)
             .then((res) => (user_list = res.data));
     };
 
     const get_teams = async () => {
         await axios
-            .get(`http://localhost:8000/teams`)
+            .get(`http://localhost:8000/team`)
             .then((res) => (team_list = res.data));
     };
 
@@ -37,25 +61,47 @@
             const [key, value] = field;
             data[key] = value;
         }
-        console.log(data);
-        await axios
-            .post(`http://localhost:8000/user`, {
-                username: data.username,
-                teamID: data.teamname,
-                hasAdmin: data.hasAdmin,
-            })
-            .then((res) => console.log(res));
+        if (login) {
+            try {
+                await axios
+                    .post(`http://localhost:8000/login`, {
+                        username: data.username,
+                        password: data.password,
+                    })
+                    .then((res) =>
+                        current_user_id.update((val) => (val = res.data))
+                    );
+                response = ["Success", "Logged in."];
+                window.location.reload();
+            } catch (error) {
+                response = ["Error", error.response.data.detail];
+            }
+        } else {
+            await axios
+                .post(`http://localhost:8000/user`, {
+                    username: data.username,
+                    password: data.password,
+                    teamID: data.teamID,
+                    hasAdmin: data.hasAdmin,
+                })
+                .then((res) =>
+                    current_user_id.update((val) => (val = res.data.id))
+                );
+            window.location.reload();
+        }
     };
-
-    let current_user;
 </script>
 
 <div class="page">
     <div class="page-title">User</div>
     <div class="content-container">
         <div class="content">
-            {#if current_user}
-                You are currently logged in as: {current_user}
+            {#if get(current_user_id) != 0}
+                {#await get_user(get(current_user_id))}
+                    Loading...
+                {:then user}
+                    You are currently logged in as: {user.username}
+                {/await}
                 <button on:click={() => toggleModal()}>Change User</button>
             {:else}
                 You are not currently logged in.
@@ -79,6 +125,11 @@
             <button class="close" on:click={() => toggleModal()}>X</button>
             {#if login}
                 <div class="page-title">Log In</div>
+                {#if response[0]}
+                    {#if showAlert}
+                        <Warning>{response[1]}</Warning>
+                    {/if}
+                {/if}
                 <div class="form-container">
                     <form on:submit|preventDefault={onSubmit}>
                         <label for="username">Username</label>
@@ -115,6 +166,12 @@
                             placeholder="Username"
                         />
 
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                        />
+
                         <label for="hasAdmin">Admin? </label>
                         <select name="hasAdmin" id="hasAdmin">
                             <option value="true">true</option>
@@ -124,7 +181,7 @@
                         </select>
 
                         <label for="teamname">Team Name</label>
-                        <select name="teamname" id="teamname">
+                        <select name="teamID" id="teamname">
                             {#each team_list as team}
                                 <option value={team.id}>{team.teamname}</option>
                             {/each}
@@ -167,7 +224,7 @@
         left: 0;
         transform: translate(20%, 20%);
         width: 60%;
-        height: 60%;
+        height: fit-content;
         position: absolute;
         background: var(--secondary);
         border-radius: 20px;

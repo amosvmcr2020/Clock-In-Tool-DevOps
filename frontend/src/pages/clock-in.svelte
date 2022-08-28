@@ -1,7 +1,16 @@
 <script>
     import Clock from "../components/clock.svelte";
     import Warning from "../components/warning.svelte";
-    let response;
+    let response = [];
+    let showAlert = false;
+    let timer;
+    $: if (response) {
+        clearTimeout(timer);
+        showAlert = true;
+        timer = setTimeout(() => {
+            showAlert = false;
+        }, 3000);
+    }
 </script>
 
 <div class="page">
@@ -12,10 +21,12 @@
         <Clock bind:response type="in" />
         <Clock bind:response type="out" />
     </div>
-    {#if response}
-        <div class="warning-container">
-            <Warning>{response}</Warning>
-        </div>
+    {#if response[0]}
+        {#if showAlert == true}
+            <div class="warning-container">
+                <Warning>{response[1]}</Warning>
+            </div>
+        {/if}
     {/if}
 </div>
 
@@ -29,5 +40,6 @@
     }
     .warning-container {
         color: #333;
+        transition: 1s;
     }
 </style>
