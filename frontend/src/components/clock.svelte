@@ -46,8 +46,6 @@
     const clock_in = async () => {
         if (userID != 0) {
             let curr_time = Date.now();
-            // This needs to be set to the current user - Global?
-
             let timesheet_id = await get_timesheet_id(userID);
 
             try {
