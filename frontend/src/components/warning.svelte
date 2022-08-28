@@ -11,7 +11,7 @@
 
 <style>
     .warning-container {
-        margin: 5%;
+        margin: 1%;
         height: fit-content;
         border-radius: 10px;
         background: var(--ternary);
@@ -24,14 +24,35 @@
         color: #333;
         padding: 1%;
 
-        position: fixed;
-        top: 0;
+        position: absolute;
         right: 0;
-        z-index: 3;
+        z-index: 99;
         width: 40%;
+        animation: slide-in 4s ease-in forwards;
     }
 
     .symbol {
         font-size: 32px;
+    }
+
+    @keyframes slide-in {
+        0% {
+            right: -50%;
+        }
+        20% {
+            right: 0%;
+        }
+        40% {
+            right: 0;
+        }
+        60% {
+            right: 0;
+        }
+        80% {
+            right: 0;
+        }
+        100% {
+            right: -50%;
+        }
     }
 </style>
