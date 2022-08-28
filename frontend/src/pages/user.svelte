@@ -4,8 +4,6 @@
 
     import { current_user_id } from "../store";
 
-    console.log(get(current_user_id));
-
     export let alerts = [];
 
     let showModal = false;

@@ -23,15 +23,13 @@
     };
 
     get_teams();
-    console.log(team_list);
 
     const check_admin = async () => {
         let userID = get(current_user_id);
-        let hasAdmin = true;
+        let hasAdmin = false;
         await axios
             .get(`http://localhost:8000/user/${userID}`)
-            .then((res) => console.log(res.data.hasAdmin));
-        console.log(hasAdmin);
+            .then((res) => (hasAdmin = res.data.hasAdmin));
         return hasAdmin;
     };
 
@@ -48,7 +46,7 @@
             return;
         }
 
-        if (await check_admin()) {
+        if ((await check_admin()) == true) {
             await axios
                 .delete(`http://localhost:8000/user/${user_id}`)
                 .then(() => alerts.push(["Success", "User Deleted"]));
@@ -66,7 +64,7 @@
             alerts = alerts;
             return;
         }
-        if (await check_admin()) {
+        if ((await check_admin()) == true) {
             await axios
                 .delete(`http://localhost:8000/team/${teamID}`)
                 .then(() => alerts.push(["Success", "Team Deleted"]));
@@ -134,73 +132,72 @@
 
 <div class="page">
     <div class="page-title">Teams</div>
-    <div class="content-container">
-        <div class="container-title">Teams</div>
-        <div class="content">
-            <div class="formContainer" />
-            <form on:submit|preventDefault={create_team}>
-                <input name="teamname" placeholder="Team Name" type="text" />
-                <input type="submit" value="Create new team" />
-            </form>
+    <div class="content">
+        <div class="formContainer" />
+        <form on:submit|preventDefault={create_team}>
+            <input name="teamname" placeholder="Team Name" type="text" />
+            <input type="submit" value="Create new team" />
+        </form>
 
-            {#each team_list as team}
-                <div class="team-header">
-                    {team.teamname}
-                    <button
-                        class="deleteButton"
-                        on:click={() => delete_team(team.id)}
-                    >
-                        <Icon icon="ion:trash-bin-sharp" />
-                    </button>
-                </div>
-                {#if team.users.length == 0}
-                    There are no users in this team.
-                {:else}
-                    <table>
-                        <tr>
-                            <th>Username</th>
-                            <th>Role</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                        <tbody>
-                            {#each team.users as user}
-                                <tr>
-                                    <td>
-                                        {user.username}
-                                    </td>
-                                    <td>
-                                        {#if user.hasAdmin}
-                                            Admin
-                                        {:else}
-                                            User
-                                        {/if}
-                                    </td>
-                                    <td class="small_column">
-                                        <button
-                                            on:click={() =>
-                                                toggleModal(user.id)}
-                                            class="edit_button"
-                                        >
-                                            <Icon icon="bxs:edit" />
-                                        </button>
-                                    </td>
-                                    <td class="small_column">
-                                        <button
-                                            on:click={() =>
-                                                delete_user(user.id)}
-                                            class="deleteButton"
-                                        >
-                                            <Icon icon="ion:trash-bin-sharp" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            {/each}
-                        </tbody>
-                    </table>
-                {/if}
-            {/each}
-        </div>
+        {#each team_list as team}
+            <div class="team-header">
+                {team.teamname}
+                <button
+                    class="deleteButton"
+                    on:click={() => delete_team(team.id)}
+                >
+                    <Icon icon="ion:trash-bin-sharp" />
+                </button>
+            </div>
+            {#if team.users.length == 0}
+                There are no users in this team.
+            {:else}
+                <table>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                    <tbody>
+                        {#each team.users as user}
+                            <tr
+                                class={user.id == get(current_user_id)
+                                    ? "current"
+                                    : ""}
+                            >
+                                <td>
+                                    {user.username}
+                                </td>
+                                <td>
+                                    {#if user.hasAdmin}
+                                        Admin
+                                    {:else}
+                                        User
+                                    {/if}
+                                </td>
+                                <td class="small_column">
+                                    <button
+                                        on:click={() => toggleModal(user.id)}
+                                        class="edit_button"
+                                    >
+                                        <Icon icon="bxs:edit" />
+                                    </button>
+                                </td>
+                                <td class="small_column">
+                                    <button
+                                        on:click={() => delete_user(user.id)}
+                                        class="deleteButton"
+                                    >
+                                        <Icon icon="ion:trash-bin-sharp" />
+                                    </button>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/if}
+        {/each}
     </div>
     {#if showModal}
         <div class="modal-container" />
@@ -265,5 +262,96 @@
 
     .end {
         align-self: end;
+    }
+
+    .current {
+        background: var(--ternary);
+    }
+
+    .current:hover {
+        background: var(--alt-ternary);
+        animation: wash 0.2s ease-in-out forwards;
+    }
+
+    @keyframes wash {
+        0% {
+            background: var(--primary);
+        }
+
+        10% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 90%
+            );
+        }
+
+        20% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 80%
+            );
+        }
+
+        30% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 70%
+            );
+        }
+
+        40% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 60%
+            );
+        }
+
+        50% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 50%
+            );
+        }
+
+        60% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 40%
+            );
+        }
+
+        70% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 30%
+            );
+        }
+
+        80% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 20%
+            );
+        }
+
+        90% {
+            background: linear-gradient(
+                -90deg,
+                var(--ternary),
+                var(--alt-ternary) 10%
+            );
+        }
+
+        100% {
+            ter--ternaryd: var(--alt-ternary);
+        }
     }
 </style>
