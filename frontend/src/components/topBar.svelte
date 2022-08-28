@@ -6,6 +6,7 @@
     const logout = () => {
         current_user_id.update((val) => (val = 0));
         console.log(get(current_user_id));
+        window.location.reload();
     };
 </script>
 
@@ -13,9 +14,10 @@
     <div class="title">Clock In Tool</div>
     <Link to="/">Home</Link>
     <Link to="/user">User</Link>
-    <Link to="/clocks">Clock-In</Link>
     <Link to="/team">Teams</Link>
-    <button class="logoutButton" on:click={() => logout()}> Log Out</button>
+    {#if get(current_user_id) != 0}
+        <button class="logoutButton" on:click={() => logout()}> Log Out</button>
+    {/if}
 </div>
 
 <style>

@@ -124,7 +124,7 @@ def get_user_timesheet(user_id: int):
     return timesheet
 
 
-@app.put('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
+@app.patch('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
 def update_user(user_id: int, new_user: User):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     user.username = new_user.username
@@ -142,6 +142,11 @@ def delete_user(user_id: int):
 
     if user is None:
         raise HTTPException(status_code=404, detail="User does not exist.")
+
+    timesheet = db.query(models.Timesheet).filter(
+        models.Timesheet.owner == user).first()
+
+    db. delete(timesheet)
 
     db.delete(user)
     db.commit
@@ -231,6 +236,10 @@ def update_team(team_id: int, new_team: Team):
 @app.delete('/team/{team_id}', response_model=Team, status_code=status.HTTP_202_ACCEPTED)
 def delete_team(team_id: int):
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
+
+    if team.users != []:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Cannot delete team with users.")
 
     if team is None:
         raise HTTPException(
