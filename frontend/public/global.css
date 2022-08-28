@@ -31,6 +31,7 @@ body {
 
 a {
 	text-decoration: none;
+	font-weight: bold;
 }
 
 a:hover {
@@ -167,4 +168,76 @@ table tbody tr:nth-of-type(odd) {
 table tbody tr:hover {
 	background: var(--midpoint);
 	transition: 0.2s;
+}
+
+/* Modal */
+
+.modal-container {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 110%;
+	position: fixed;
+	background: black;
+	opacity: 0.5;
+	animation: semifadein 0.5s;
+	-webkit-animation: semifadein 0.5s;
+}
+
+.modal-window {
+	top: 0;
+	left: 0;
+	transform: translate(20%, 20%);
+	width: 60%;
+	height: fit-content;
+	position: fixed;
+	background: var(--secondary);
+	border-radius: 20px;
+	padding: 5%;
+	animation: fadein 0.5s;
+	-webkit-animation: fadein 0.5s;
+}
+
+.close {
+	justify-self: end;
+	font-family: monospace;
+	float: right;
+	width: 30px;
+	height: 30px;
+}
+
+@keyframes fadein {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes semifadein {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 0.5;
+	}
+}
+
+.modalFormContainer {
+	background: #ffffff;
+	width: 90%;
+	height: inherit;
+	padding: 5%;
+	border-radius: 20px;
+	display: flex;
+	flex-direction: column;
+}
+
+.modalForm {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 }

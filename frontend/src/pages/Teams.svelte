@@ -1,44 +1,50 @@
 <script>
     import axios from "axios";
-    import Warning from "../components/warning.svelte";
     import Icon from "@iconify/svelte";
     import { current_user_id } from "../store";
     import { get } from "svelte/store";
 
+    export let alerts = [];
     let team_list = [];
-    let response = [];
-    let showAlert = false;
-    let timer;
-    $: if (response) {
-        clearTimeout(timer);
-        showAlert = true;
-        timer = setTimeout(() => {
-            showAlert = false;
-        }, 3000);
-    }
+    let target_user = 0;
+
+    let showModal = false;
+
+    const toggleModal = async (target) => {
+        target_user = target;
+        await get_teams();
+        showModal = !showModal;
+    };
 
     const get_teams = async () => {
         await axios
             .get(`http://localhost:8000/team`)
             .then((res) => (team_list = res.data));
-
-        return team_list;
     };
 
+    get_teams();
+    console.log(team_list);
+
     const delete_team = async (teamID) => {
+        if (get(current_user_id) == 0) {
+            alerts.push(["Error", "You must be logged in to do this."]);
+            return;
+        }
         if (await check_admin()) {
             await axios
                 .delete(`http://localhost:8000/team/${teamID}`)
-                .then(() => (response = ["Success", "Team Deleted"]));
-            window.location.reload();
+                .then(() => alerts.push(["Success", "Team Deleted"]));
+            alerts = alerts;
+            get_teams();
         } else {
-            response = ["Error", "You do not have admin priveledges."];
+            alerts.push(["Error", "You do not have admin priveledges."]);
+            alerts = alerts;
         }
     };
 
     const check_admin = async () => {
         let userID = get(current_user_id);
-        let hasAdmin = false;
+        let hasAdmin = true;
         await axios
             .get(`http://localhost:8000/user/${userID}`)
             .then((res) => console.log(res.data));
@@ -58,12 +64,43 @@
                 .post(`http://localhost:8000/team`, {
                     teamname: data.teamname,
                 })
-                .then(
-                    () => (response = ["Success", "Team Successfully Created"])
+                .then(() =>
+                    alerts.push(["Success", "Team Successfully Created"])
                 );
-            window.location.reload();
+            alerts = alerts;
+            get_teams();
         } catch (error) {
-            response = ["Error", error.response.data.detail];
+            alerts.push(["Error", error.response.data.detail]);
+            alerts = alerts;
+        }
+    };
+
+    const editUser = async (e) => {
+        if (!check_admin(get(current_user_id))) {
+            alerts.push("Error", "You do not have admin priveleges.");
+            return;
+        }
+        const formData = new FormData(e.target);
+
+        const data = {};
+        for (let field of formData) {
+            const [key, value] = field;
+            data[key] = value;
+        }
+
+        try {
+            await axios
+                .patch(`http://localhost:8000/user/${target_user}`, {
+                    username: data.username,
+                    hasAdmin: data.hasAdmin,
+                    teamID: data.teamID,
+                })
+                .then(() => alerts.push("Success", "User edited successfully"));
+            get_teams();
+            toggleModal(0);
+        } catch (error) {
+            alerts.push(["Error", error.response.data.detail]);
+            alerts = alerts;
         }
     };
 </script>
@@ -73,59 +110,104 @@
     <div class="content-container">
         <div class="container-title">Teams</div>
         <div class="content">
-            {#if response[0]}
-                {#if showAlert}
-                    <Warning>{response[1]}</Warning>
-                {/if}
-            {/if}
             <div class="formContainer" />
             <form on:submit|preventDefault={onSubmit}>
                 <input name="teamname" placeholder="Team Name" type="text" />
                 <input type="submit" value="Create new team" />
             </form>
-            {#await get_teams()}
-                Loading...
-            {:then team_list}
-                {#each team_list as team}
-                    <div class="team-header">
-                        {team.teamname}
-                        <button
-                            class="deleteButton"
-                            on:click={() => delete_team(team.id)}
-                        >
-                            <Icon icon="ion:trash-bin-sharp" />
-                        </button>
-                    </div>
-                    {#if team.users.length == 0}
-                        There are no users in this team.
-                    {:else}
-                        <table>
-                            <tr>
-                                <th>Username</th>
-                                <th>Role</th>
-                            </tr>
-                            <tbody>
-                                {#each team.users as user}
-                                    <tr>
-                                        <td>
-                                            {user.username}
-                                        </td>
-                                        <td>
-                                            {#if user.hasAdmin}
-                                                Admin
-                                            {:else}
-                                                User
-                                            {/if}
-                                        </td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                        </table>
-                    {/if}
-                {/each}
-            {/await}
+
+            {#each team_list as team}
+                <div class="team-header">
+                    {team.teamname}
+                    <button
+                        class="deleteButton"
+                        on:click={() => delete_team(team.id)}
+                    >
+                        <Icon icon="ion:trash-bin-sharp" />
+                    </button>
+                </div>
+                {#if team.users.length == 0}
+                    There are no users in this team.
+                {:else}
+                    <table>
+                        <tr>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                        <tbody>
+                            {#each team.users as user}
+                                <tr>
+                                    <td>
+                                        {user.username}
+                                    </td>
+                                    <td>
+                                        {#if user.hasAdmin}
+                                            Admin
+                                        {:else}
+                                            User
+                                        {/if}
+                                    </td>
+                                    <td class="small_column">
+                                        <button
+                                            on:click={() =>
+                                                toggleModal(user.id)}
+                                            class="edit_button"
+                                        >
+                                            <Icon icon="bxs:edit" />
+                                        </button>
+                                    </td>
+                                    <td class="small_column">
+                                        <button class="deleteButton">
+                                            <Icon icon="ion:trash-bin-sharp" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                    </table>
+                {/if}
+            {/each}
         </div>
     </div>
+    {#if showModal}
+        <div class="modal-container" />
+        <div class="modal-window">
+            <button class="close" on:click={() => toggleModal(0)}>X</button>
+            <div class="page-title">Edit User</div>
+            <div class="modalFormContainer">
+                <form class="modalForm" on:submit|preventDefault={editUser}>
+                    <label for="username">Username</label>
+                    <input type="text" name="username" placeholder="Username" />
+
+                    <!-- <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                    /> -->
+
+                    <!-- Change this to a switch -->
+                    <label for="hasAdmin">Admin? </label>
+                    <select name="hasAdmin" id="hasAdmin">
+                        <option value="true">true</option>
+                        <option selected="selected" value="false">
+                            false
+                        </option>
+                    </select>
+
+                    <label for="teamname">Team Name</label>
+                    <select name="teamID" id="teamname">
+                        {#each team_list as team}
+                            <option value={team.id}>{team.teamname}</option>
+                        {/each}
+                    </select>
+
+                    <input class="end" type="submit" value="Submit" />
+                </form>
+            </div>
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -148,5 +230,18 @@
     .formContainer {
         display: flex;
         flex-direction: row;
+    }
+
+    .edit_button {
+        font-size: 32px;
+        background: none;
+    }
+
+    .small_column {
+        width: 10%;
+    }
+
+    .end {
+        align-self: end;
     }
 </style>
