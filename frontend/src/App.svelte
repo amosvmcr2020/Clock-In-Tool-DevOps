@@ -10,12 +10,12 @@
 	// TODO: Change response to be a list of alerts etc. and stack them.
 	export let alerts = [];
 
-	$: alerts,
-		console.log(alerts),
-		setTimeout(() => {
-			alerts.pop();
-		}, 3000),
-		(alerts = alerts);
+	// $: alerts,
+	// 	console.log(alerts),
+	// 	setTimeout(() => {
+	// 		alerts.pop();
+	// 	}, 3000),
+	// 	(alerts = alerts);
 </script>
 
 <!-- TODO: FIX THIS -->
@@ -41,13 +41,16 @@
 
 <style>
 	.warningContainer {
-		position: absolute;
+		overflow: hidden;
+		position: fixed;
 		top: 0;
 		display: flex;
-		flex-direction: column;
-		gap: 5px;
+		flex-direction: column-reverse;
+		gap: 10px;
 		width: 100%;
+		z-index: 9999;
 		/* height: 100%; */
+		pointer-events: none;
 	}
 
 	.notification {

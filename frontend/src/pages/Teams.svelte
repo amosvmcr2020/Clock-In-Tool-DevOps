@@ -25,9 +25,45 @@
     get_teams();
     console.log(team_list);
 
+    const check_admin = async () => {
+        let userID = get(current_user_id);
+        let hasAdmin = true;
+        await axios
+            .get(`http://localhost:8000/user/${userID}`)
+            .then((res) => console.log(res.data.hasAdmin));
+        console.log(hasAdmin);
+        return hasAdmin;
+    };
+
+    const delete_user = async (user_id) => {
+        if (get(current_user_id) == 0) {
+            alerts.push(["Error", "You must be logged in to do this."]);
+            alerts = alerts;
+            return;
+        }
+
+        if (get(current_user_id) == user_id) {
+            alerts.push(["Error", "You can't delete yourself."]);
+            alerts = alerts;
+            return;
+        }
+
+        if (await check_admin()) {
+            await axios
+                .delete(`http://localhost:8000/user/${user_id}`)
+                .then(() => alerts.push(["Success", "User Deleted"]));
+            alerts = alerts;
+            get_teams();
+        } else {
+            alerts.push(["Error", "You do not have admin priveledges."]);
+            alerts = alerts;
+        }
+    };
+
     const delete_team = async (teamID) => {
         if (get(current_user_id) == 0) {
             alerts.push(["Error", "You must be logged in to do this."]);
+            alerts = alerts;
             return;
         }
         if (await check_admin()) {
@@ -42,16 +78,7 @@
         }
     };
 
-    const check_admin = async () => {
-        let userID = get(current_user_id);
-        let hasAdmin = true;
-        await axios
-            .get(`http://localhost:8000/user/${userID}`)
-            .then((res) => console.log(res.data));
-        return hasAdmin;
-    };
-
-    const onSubmit = async (e) => {
+    const create_team = async (e) => {
         const formData = new FormData(e.target);
 
         const data = {};
@@ -111,7 +138,7 @@
         <div class="container-title">Teams</div>
         <div class="content">
             <div class="formContainer" />
-            <form on:submit|preventDefault={onSubmit}>
+            <form on:submit|preventDefault={create_team}>
                 <input name="teamname" placeholder="Team Name" type="text" />
                 <input type="submit" value="Create new team" />
             </form>
@@ -159,7 +186,11 @@
                                         </button>
                                     </td>
                                     <td class="small_column">
-                                        <button class="deleteButton">
+                                        <button
+                                            on:click={() =>
+                                                delete_user(user.id)}
+                                            class="deleteButton"
+                                        >
                                             <Icon icon="ion:trash-bin-sharp" />
                                         </button>
                                     </td>
@@ -178,15 +209,6 @@
             <div class="page-title">Edit User</div>
             <div class="modalFormContainer">
                 <form class="modalForm" on:submit|preventDefault={editUser}>
-                    <label for="username">Username</label>
-                    <input type="text" name="username" placeholder="Username" />
-
-                    <!-- <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                    /> -->
-
                     <!-- Change this to a switch -->
                     <label for="hasAdmin">Admin? </label>
                     <select name="hasAdmin" id="hasAdmin">
