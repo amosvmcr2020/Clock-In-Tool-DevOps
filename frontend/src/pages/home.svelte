@@ -1,6 +1,5 @@
 <script>
     import axios from "axios";
-    import { get } from "svelte/store";
     import { current_user_id } from "../store";
     import { Link } from "svelte-navigator";
     import ClockIn from "./clock-in.svelte";
@@ -10,16 +9,18 @@
 
     export let alerts;
 
+    $: alerts, get_timesheet($current_user_id);
+
     const get_timesheet = async (user_id) => {
         await axios
             .get(`http://localhost:8000/user/${user_id}/timesheet/summary`)
             .then((res) => (times = res.data.times));
-        return times;
+        times = times;
     };
 
     const get_current_user = async () => {
         await axios
-            .get(`http://localhost:8000/user/${get(current_user_id)}`)
+            .get(`http://localhost:8000/user/${$current_user_id}`)
             .then((res) => (user = res.data));
         return user;
     };
@@ -32,10 +33,12 @@
         date = date.toLocaleTimeString();
         return date;
     };
+
+    get_timesheet($current_user_id);
 </script>
 
 <div class="page">
-    {#if get(current_user_id) == 0}
+    {#if !$current_user_id}
         <div class="page-title">Hello!</div>
         <div class="msgContainer">
             <p>You are not currently logged in. Please log in</p>
@@ -46,10 +49,11 @@
             Loading
         {:then user}
             <div class="page-title">Hello {user.username}!</div>
-            {#await get_timesheet(user.id)}
-                Loading
-            {:then times}
-                <ClockIn bind:alerts />
+
+            <ClockIn bind:alerts />
+            {#if times.length == 0}
+                <p>You haven't logged any times yet.</p>
+            {:else}
                 <h3>Have a look at your times below:</h3>
                 <table>
                     <tr>
@@ -68,7 +72,7 @@
                         {/each}
                     </tbody>
                 </table>
-            {/await}
+            {/if}
         {/await}
     {/if}
 </div>

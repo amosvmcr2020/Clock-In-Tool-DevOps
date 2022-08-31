@@ -1,29 +1,53 @@
 <script>
     import { Link } from "svelte-navigator";
-    import { get } from "svelte/store";
     import { current_user_id } from "../store";
+    import axios from "axios";
+    import AdminBar from "./adminBar.svelte";
 
     const logout = () => {
-        current_user_id.update((val) => (val = 0));
-        window.location.reload();
+        $current_user_id = null;
+        // current_user_id.update((val) => (val = 0));
+        // window.location.reload();
+    };
+
+    const check_admin = async (userID) => {
+        let hasAdmin = false;
+        if (userID == null) {
+            return false;
+        }
+        await axios
+            .get(`http://localhost:8000/user/${userID}`)
+            .then((res) => (hasAdmin = res.data.hasAdmin));
+        return hasAdmin;
     };
 </script>
 
-<div class="topBar">
-    <div class="title">Clock In Tool</div>
-    <Link to="/">Home</Link>
-    <Link to="/user">User</Link>
-    <Link to="/team">Teams</Link>
-    {#if get(current_user_id) != 0}
-        <button class="logoutButton" on:click={() => logout()}> Log Out</button>
-    {/if}
+<div class="container">
+    {#await check_admin($current_user_id) then hasAdmin}
+        {#if hasAdmin}
+            <AdminBar />
+        {/if}
+    {/await}
+    <div class="topBar">
+        <div class="title">Clock In Tool</div>
+        <Link to="/home">Home</Link>
+        <Link to="/user">User</Link>
+        <Link to="/team">Teams</Link>
+        {#if $current_user_id}
+            <button class="logoutButton" on:click={() => logout()}>
+                Log Out</button
+            >
+        {/if}
+    </div>
 </div>
 
 <style>
-    .topBar {
+    .container {
+        position: fixed;
         width: 100%;
         height: 80px;
-        position: fixed;
+    }
+    .topBar {
         /* background: linear-gradient(90deg, var(--primary) 10%, var(--secondary) 100%); */
         background-color: var(--secondary);
         color: var(--text);
