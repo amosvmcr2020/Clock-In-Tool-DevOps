@@ -25,13 +25,6 @@ class UserLogin(BaseModel):
     password: str
 
 
-class UserOut(BaseModel):
-    id: int
-    username: str
-    hasAdmin: bool
-    teamID: int
-
-
 class Team(BaseModel):
     id: Optional[int]
     teamname: str
