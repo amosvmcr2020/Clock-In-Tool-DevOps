@@ -2,11 +2,11 @@
     import axios from "axios";
     import Icon from "@iconify/svelte";
     import { current_user_id } from "../store";
-    import { get } from "svelte/store";
 
     export let alerts = [];
     let team_list = [];
     let target_user = 0;
+    let current_user = $current_user_id;
 
     let showModal = false;
 
@@ -25,7 +25,7 @@
     get_teams();
 
     const check_admin = async () => {
-        let userID = get(current_user_id);
+        let userID = current_user;
         let hasAdmin = false;
         await axios
             .get(`http://localhost:8000/user/${userID}`)
@@ -34,13 +34,13 @@
     };
 
     const delete_user = async (user_id) => {
-        if (get(current_user_id) == 0) {
+        if (current_user == 0) {
             alerts.push(["Error", "You must be logged in to do this."]);
             alerts = alerts;
             return;
         }
 
-        if (get(current_user_id) == user_id) {
+        if (current_user == user_id) {
             alerts.push(["Error", "You can't delete yourself."]);
             alerts = alerts;
             return;
@@ -59,7 +59,7 @@
     };
 
     const delete_team = async (teamID) => {
-        if (get(current_user_id) == 0) {
+        if (!$current_user_id) {
             alerts.push(["Error", "You must be logged in to do this."]);
             alerts = alerts;
             return;
@@ -78,6 +78,11 @@
 
     const create_team = async (e) => {
         const formData = new FormData(e.target);
+        if (current_user == 0) {
+            alerts.push(["Error", "You must be logged in to do this."]);
+            alerts = alerts;
+            return;
+        }
 
         const data = {};
         for (let field of formData) {
@@ -101,8 +106,14 @@
     };
 
     const editUser = async (e) => {
-        if (!check_admin(get(current_user_id))) {
+        if (current_user == 0) {
+            alerts.push(["Error", "You must be logged in to do this."]);
+            alerts = alerts;
+            return;
+        }
+        if (!check_admin($current_user_id)) {
             alerts.push("Error", "You do not have admin priveleges.");
+            alerts = alerts;
             return;
         }
         const formData = new FormData(e.target);
@@ -162,12 +173,17 @@
                     <tbody>
                         {#each team.users as user}
                             <tr
-                                class={user.id == get(current_user_id)
+                                class={user.id == $current_user_id
                                     ? "current"
                                     : ""}
                             >
                                 <td>
                                     {user.username}
+                                    <strong>
+                                        {user.id == $current_user_id
+                                            ? "(You)"
+                                            : ""}
+                                    </strong>
                                 </td>
                                 <td>
                                     {#if user.hasAdmin}
@@ -206,6 +222,8 @@
             <div class="page-title">Edit User</div>
             <div class="modalFormContainer">
                 <form class="modalForm" on:submit|preventDefault={editUser}>
+                    <label for="username">Username</label>
+                    <input type="text" name="username" placeholder="Username" />
                     <!-- Change this to a switch -->
                     <label for="hasAdmin">Admin? </label>
                     <select name="hasAdmin" id="hasAdmin">
@@ -351,7 +369,7 @@
         }
 
         100% {
-            ter--ternaryd: var(--alt-ternary);
+            background: var(--alt-ternary);
         }
     }
 </style>

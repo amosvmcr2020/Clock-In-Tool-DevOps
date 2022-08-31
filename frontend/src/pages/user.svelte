@@ -1,6 +1,5 @@
 <script>
     import axios from "axios";
-    import { get } from "svelte/store";
 
     import { current_user_id } from "../store";
 
@@ -86,8 +85,8 @@
     <div class="page-title">User</div>
     <div class="content-container">
         <div class="content">
-            {#if get(current_user_id) != 0}
-                {#await get_user(get(current_user_id))}
+            {#if $current_user_id}
+                {#await get_user($current_user_id)}
                     Loading...
                 {:then user}
                     You are currently logged in as: {user.username}
@@ -199,5 +198,6 @@
 
     .bottom {
         padding-top: 10px;
+        color: #333;
     }
 </style>
