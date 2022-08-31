@@ -7,8 +7,9 @@
 	import User from "./pages/user.svelte";
 	import Warning from "./components/warning.svelte";
 	import Success from "./components/success.svelte";
+	import Login from "./pages/login.svelte";
+	import PrivateRouteGuard from "./components/PrivateRouteGuard.svelte";
 
-	// TODO: Change response to be a list of alerts etc. and stack them.
 	export let alerts = [];
 </script>
 
@@ -25,14 +26,22 @@
 </div>
 <Router primary={false}>
 	<TopBar />
-	<Route path="/">
-		<Home bind:alerts />
-	</Route>
-	<Route path="user">
-		<User bind:alerts />
-	</Route>
-	<Route path="/team">
-		<Teams bind:alerts />
+	<PrivateRouteGuard>
+		<Route path="/">
+			<Login bind:alerts />
+		</Route>
+		<Route path="/home">
+			<Home bind:alerts />
+		</Route>
+		<Route path="user">
+			<User bind:alerts />
+		</Route>
+		<Route path="/team">
+			<Teams bind:alerts />
+		</Route>
+	</PrivateRouteGuard>
+	<Route path="/login">
+		<Login bind:alerts />
 	</Route>
 </Router>
 
@@ -48,6 +57,7 @@
 		z-index: 9999;
 		pointer-events: none;
 		min-height: 10%;
+		padding-bottom: 20px;
 	}
 
 	.notification {

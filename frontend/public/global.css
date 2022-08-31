@@ -53,7 +53,7 @@ a:visited {
 }
 
 a:active {
-	color: red;
+	color: var(--ternary);
 }
 
 .page {
@@ -124,6 +124,14 @@ input[type=submit] {
 	overflow: hidden;
 	border-radius: 5px;
 	color: var(--text);
+	box-shadow: 3px 3px #333;
+	transition: 0.5s
+}
+
+button:active,
+input[type=submit]:active {
+	box-shadow: 1px 1px #333;
+	transform: translate(1px, 1px);
 }
 
 .deleteButton {
@@ -308,6 +316,7 @@ table tbody tr:nth-of-type(even):hover {
 	float: right;
 	width: 30px;
 	height: 30px;
+	box-shadow: none;
 }
 
 @keyframes fadein {

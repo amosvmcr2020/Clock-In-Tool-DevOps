@@ -1,11 +1,10 @@
 <script>
     export let type;
     import axios from "axios";
-    import { get } from "svelte/store";
     import { current_user_id } from "../store";
     export let alerts;
 
-    let userID = get(current_user_id);
+    let userID = $current_user_id;
 
     const get_timesheet_id = async (userID) => {
         let id;
@@ -181,6 +180,7 @@
         justify-content: center;
         border-style: solid;
         box-shadow: 10px 10px #333;
+        transition: 0.5s;
     }
 
     .icon-container:active {
@@ -210,7 +210,7 @@
     }
     .hour {
         height: 40px;
-        width: 5px;
+        /* width: 5px; */
     }
 
     .icon-container:hover .icon-out {
