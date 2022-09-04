@@ -29,7 +29,7 @@
         {/if}
     {/await}
     <div class="topBar">
-        <div class="title">Clock In Tool</div>
+        <div class="title">Tick Tock</div>
         <Link to="/home">Home</Link>
         <Link to="/user">User</Link>
         <Link to="/team">Teams</Link>

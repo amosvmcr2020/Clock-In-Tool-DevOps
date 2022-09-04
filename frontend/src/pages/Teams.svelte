@@ -45,15 +45,16 @@
             alerts = alerts;
             return;
         }
-
-        if ((await check_admin()) == true) {
+        try {
             await axios
-                .delete(`http://localhost:8000/user/${user_id}`)
+                .delete(
+                    `http://localhost:8000/user/${user_id}?authUserID=${$current_user_id}`
+                )
                 .then(() => alerts.push(["Success", "User Deleted"]));
             alerts = alerts;
             get_teams();
-        } else {
-            alerts.push(["Error", "You do not have admin priveledges."]);
+        } catch (error) {
+            alerts.push(["Error", error.response.data.detail]);
             alerts = alerts;
         }
     };
