@@ -246,7 +246,11 @@ def update_team(team_id: int, new_team: Team):
 
 
 @app.delete('/team/{team_id}', response_model=Team, status_code=status.HTTP_202_ACCEPTED)
-def delete_team(team_id: int):
+def delete_team(team_id: int, authUserID: int):
+    if not checkAdmin(authUserID):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You must have admin priveledges to do this.")
+
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
 
     if team.users != []:
