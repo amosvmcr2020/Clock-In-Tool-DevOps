@@ -1,3 +1,5 @@
+import hashlib
+
 from datetime import datetime
 from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,7 +10,8 @@ from schemas import *
 from database import SessionLocal
 import models
 
-app = FastAPI()
+app = FastAPI(title="Clock In API", swagger_ui_parameters={
+              "operationsSorter": "method"})
 
 origins = [
     "http://localhost",
@@ -27,9 +30,8 @@ app.add_middleware(
 db = SessionLocal()
 
 
-def hash(password):
-    hashed_password = password
-    return hashed_password
+def hashFunc(password):
+    return hashlib.sha1(password.encode("UTF-8")).hexdigest()
 
 
 @app.get('/')
@@ -59,6 +61,9 @@ def create_user(user: UserIn):
     if user.username == "":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username cannot be empty")
+    if user.password == "":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Password cannot be empty")
 
     check_user = db.query(models.User).filter(
         models.User.username == user.username).first()
@@ -74,7 +79,7 @@ def create_user(user: UserIn):
 
     new_user = models.User(
         username=user.username,
-        hashed_password=hash(user.password),
+        hashed_password=hashFunc(user.password),
         hasAdmin=user.hasAdmin,
         teamID=user.teamID
     )
@@ -129,7 +134,7 @@ def update_user(user_id: int, new_user: User):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     check_user = db.query(models.User).filter(
         models.User.username == new_user.username).first()
-    if check_user is not None:
+    if check_user is not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="This username is already taken")
     user.username = new_user.username
@@ -166,7 +171,7 @@ def user_login(user: UserLogin):
     if check_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Username or password is incorrect.")
-    if user.password == check_user.hashed_password:
+    if hashFunc(user.password) == check_user.hashed_password:
         return check_user.id
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Username or password is incorrect.")
