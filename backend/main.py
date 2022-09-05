@@ -34,6 +34,11 @@ def hashFunc(password):
     return hashlib.sha1(password.encode("UTF-8")).hexdigest()
 
 
+def checkAdmin(userID):
+    user = db.query(models.User).filter(models.User.id == userID).first()
+    return user.hasAdmin
+
+
 @app.get('/')
 def responding():
     return "API is responding"
@@ -147,7 +152,11 @@ def update_user(user_id: int, new_user: User):
 
 
 @app.delete('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
-def delete_user(user_id: int):
+def delete_user(user_id: int, authUserID: int):
+
+    if not checkAdmin(authUserID):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You must have admin priveledges to do this.")
     user = db.query(models.User).filter(models.User.id == user_id).first()
 
     if user is None:
@@ -237,7 +246,11 @@ def update_team(team_id: int, new_team: Team):
 
 
 @app.delete('/team/{team_id}', response_model=Team, status_code=status.HTTP_202_ACCEPTED)
-def delete_team(team_id: int):
+def delete_team(team_id: int, authUserID: int):
+    if not checkAdmin(authUserID):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You must have admin priveledges to do this.")
+
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
 
     if team.users != []:
