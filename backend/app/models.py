@@ -1,9 +1,9 @@
-from .database import Base
+from . import database
 from sqlalchemy import String, Boolean, Integer, Column, Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 
-class User(Base):
+class User(database.Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     username = Column(String(255), nullable=False, unique=True)
@@ -20,7 +20,7 @@ class User(Base):
         return f"{self.id} : {self.username} is an Admin" if self.hasAdmin else f"{id} : {self.username} is not an Admin"
 
 
-class Team(Base):
+class Team(database.Base):
     __tablename__ = "teams"
     id = Column(Integer, primary_key=True)
     teamname = Column(String(255), nullable=False, unique=True)
@@ -31,7 +31,7 @@ class Team(Base):
         return self.teamname
 
 
-class Timesheet(Base):
+class Timesheet(database.Base):
     __tablename__ = "timesheets"
     id = Column(Integer, primary_key=True)
 
@@ -39,7 +39,7 @@ class Timesheet(Base):
     times = relationship("Entry", back_populates="timesheet")
 
 
-class Entry(Base):
+class Entry(database.Base):
     __tablename__ = "time_entries"
     id = Column(Integer, primary_key=True)
 
