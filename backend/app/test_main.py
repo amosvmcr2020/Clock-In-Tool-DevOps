@@ -1,4 +1,3 @@
-from urllib import response
 from fastapi.testclient import TestClient
 from .main import app
 from .create_db import create_new_db
@@ -284,4 +283,72 @@ def test_unauthorised_delete_team():
     assert response.status_code == 401
     assert response.json() == {
         "detail": "You must have admin priveledges to do this."
+    }
+
+
+# Test clock in
+def test_clock_in():
+    response = client.post(
+        "/clock-in", json={"millis_in": 1662712200000, "timesheetID": 1})
+    assert response.status_code == 202
+    assert response.json() == {
+        "id": 4,
+        "date": "09/09/22",
+        "time_in": "2022-09-09T09:30:00",
+        "time_out": None,
+        "timesheetID": 1
+    }
+
+
+# Test clock in twice in one day
+def test_duplicate_clock_in():
+    response = client.post(
+        "/clock-in", json={"millis_in": 1662712200000, "timesheetID": 1})
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "You have already clocked in today."
+    }
+
+
+# Test clock in with invalid timesheet
+def test_no_timesheet_clock_in():
+    response = client.post(
+        "/clock-in", json={"millis_in": 1662712200000, "timesheetID": 99})
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Timesheet not found."
+    }
+
+
+# Test clock out
+def test_clock_out():
+    response = client.put(
+        "/clock-out", json={"millis_out": 1662739200000, "timesheetID": 1})
+    assert response.status_code == 202
+    assert response.json() == {
+        "id": 4,
+        "date": "09/09/22",
+        "time_in": "2022-09-09T09:30:00",
+        "time_out": "2022-09-09T17:00:00",
+        "timesheetID": 1
+    }
+
+
+# Test clock out twice in one day
+def test_duplicate_clock_out():
+    response = client.put(
+        "/clock-out", json={"millis_out": 1662739200000, "timesheetID": 1})
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "You have already clocked out today."
+    }
+
+
+# Test clock out without clocking in
+def test_clock_out_without_clock_in():
+    response = client.put(
+        "/clock-out", json={"millis_out": 1662825600000, "timesheetID": 99})
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "You have not clocked in today."
     }

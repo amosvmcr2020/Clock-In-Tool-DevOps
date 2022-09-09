@@ -349,6 +349,11 @@ def clock_in(entry: schemas.Clock_req):
             status_code=status.HTTP_400_BAD_REQUEST, detail="No clock-in time provided")
     timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.id == entry.timesheetID).first()
+
+    if timesheet is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Timesheet not found.")
+
     date = time_in.strftime("%x")
     # serach for clock-in date in existing records
     if any(entry.date == date for entry in timesheet.times):
@@ -368,7 +373,7 @@ def clock_in(entry: schemas.Clock_req):
     return new_entry
 
 
-@app.put("/clock-out", response_model=schemas.Entry, status_code=status.HTTP_200_OK)
+@app.put("/clock-out", response_model=schemas.Entry, status_code=status.HTTP_202_ACCEPTED)
 def clock_out(new_entry: schemas.Clock_req):
 
     if new_entry.millis_out:
