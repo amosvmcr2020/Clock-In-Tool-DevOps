@@ -226,6 +226,20 @@ def create_team(team: schemas.Team):
     return new_team
 
 
+@app.get('/team/user/{user_id}', response_model=schemas.Team, status_code=status.HTTP_200_OK)
+def get_user_team(user_id: int):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    team = db.query(models.Team).filter(models.Team.id == user.teamID).first()
+    if team is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Team not found."
+        )
+    return team
+
+
 # Not used
 @app.put('/team/{team_id}', response_model=schemas.Team, status_code=status.HTTP_202_ACCEPTED)
 def update_team(team_id: int, new_team: schemas.Team):
