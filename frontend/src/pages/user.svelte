@@ -1,5 +1,6 @@
 <script>
     import axios from "axios";
+    import DataTable from "../components/dataTable.svelte";
 
     import { current_user_id } from "../store";
 
@@ -79,6 +80,79 @@
             window.location.reload();
         }
     };
+
+    let userTable = [];
+    let teamTable = [];
+    let timesheetTable = [];
+    let entryTable = [];
+
+    let showTables = false;
+
+    const get_user_summary = async (e) => {
+        const formData = new FormData(e.target);
+
+        const data = {};
+        for (let field of formData) {
+            const [key, value] = field;
+            data[key] = value;
+        }
+
+        let userID = data.userID;
+
+        await axios.get(`http://localhost:8000/user/${userID}`).then((res) => {
+            let userData = res.data;
+            userTable = [
+                "User",
+                {
+                    id: userData.id,
+                    username: userData.username,
+                    hasAdmin: userData.hasAdmin,
+                    teamID: userData.teamID,
+                },
+            ];
+        });
+        await axios
+            .get(`http://localhost:8000/team/user/${userID}`)
+            .then((res) => {
+                let teamData = res.data;
+                teamTable = [
+                    "Team",
+                    {
+                        id: teamData.id,
+                        teamname: teamData.teamname,
+                    },
+                ];
+            });
+        await axios
+            .get(`http://localhost:8000/user/${userID}/timesheet/summary`)
+            .then((res) => {
+                let timesheetData = res.data;
+                let times = timesheetData.times;
+                entryTable = ["Entry"];
+                for (let i = 0; i < times.length; i++) {
+                    entryTable.push(times[i]);
+                }
+                if (entryTable.length == 1) {
+                    entryTable.push({
+                        id: "Empty",
+                        date: "",
+                        time_in: "",
+                        time_out: "",
+                        timesheetID: "",
+                    });
+                }
+                console.log(entryTable);
+                timesheetTable = [
+                    "Timesheet",
+                    {
+                        id: timesheetData.id,
+                    },
+                ];
+            });
+        showTables = true;
+    };
+
+    get_users();
 </script>
 
 <div class="page">
@@ -97,17 +171,32 @@
                 <button on:click={() => toggleModal()}> Log in </button>
             {/if}
         </div>
-        <div class="content">
-            <button on:click={() => get_users()}> Get Users </button>
-        </div>
-        <div class="content">
-            {#each user_list as user}
-                <p>
-                    {user.username}
-                </p>
-            {/each}
-        </div>
+        <form on:submit|preventDefault={get_user_summary}>
+            If you would like to view a user's table, query them below:
+            <div class="formContainer">
+                <select name="userID" id="username">
+                    {#each user_list as user}
+                        <option value={user.id}>{user.username}</option>
+                    {/each}
+                </select>
+                <input type="submit" value="Query User" />
+            </div>
+        </form>
     </div>
+    {#if showTables}
+        <div class="subtitle">
+            {userTable[1].username}
+        </div>
+        <div class="tables">
+            <DataTable bind:data={teamTable} />
+            <p>1-∞</p>
+            <DataTable bind:data={userTable} />
+            <p>1-1</p>
+            <DataTable bind:data={timesheetTable} />
+            <p>1-∞</p>
+            <DataTable bind:data={entryTable} />
+        </div>
+    {/if}
     {#if showModal}
         <div class="modal-container" />
         <div class="modal-window">
@@ -199,5 +288,24 @@
     .bottom {
         padding-top: 10px;
         color: #333;
+    }
+
+    .formContainer {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        margin: 10px;
+    }
+
+    .tables {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+        margin-top: 50px;
+    }
+    p {
+        color: var(--text);
+        padding: 10px;
     }
 </style>

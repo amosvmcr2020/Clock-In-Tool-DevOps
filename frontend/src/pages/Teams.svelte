@@ -148,7 +148,6 @@
 <div class="page">
     <div class="page-title">Teams</div>
     <div class="content">
-        <div class="formContainer" />
         <form on:submit|preventDefault={create_team}>
             <input name="teamname" placeholder="Team Name" type="text" />
             <input type="submit" value="Create new team" />
@@ -267,12 +266,6 @@
     table {
         text-align: center;
     }
-
-    .formContainer {
-        display: flex;
-        flex-direction: row;
-    }
-
     .edit_button {
         font-size: 32px;
         background: none;
