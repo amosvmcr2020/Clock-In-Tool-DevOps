@@ -33,6 +33,7 @@
         <Link to="/home">Home</Link>
         <Link to="/user">User</Link>
         <Link to="/team">Teams</Link>
+        <Link to="/database">Database</Link>
         {#if $current_user_id}
             <button class="logoutButton" on:click={() => logout()}>
                 Log Out</button

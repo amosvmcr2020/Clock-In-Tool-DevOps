@@ -5,10 +5,7 @@ from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-from schemas import *
-
-from database import SessionLocal
-import models
+from . import schemas, database, models
 
 app = FastAPI(title="Clock In API", swagger_ui_parameters={
               "operationsSorter": "method"})
@@ -27,7 +24,7 @@ app.add_middleware(
 )
 
 
-db = SessionLocal()
+db = database.SessionLocal()
 
 
 def hashFunc(password):
@@ -46,13 +43,13 @@ def responding():
 # User endpoints ------------------
 
 
-@app.get('/user', response_model=List[User], status_code=status.HTTP_200_OK)
+@app.get('/user', response_model=List[schemas.User], status_code=status.HTTP_200_OK)
 def get_users():
     users = db.query(models.User).all()
     return users
 
 
-@app.get('/user/{user_id}', response_model=User, status_code=status.HTTP_200_OK)
+@app.get('/user/{user_id}', response_model=schemas.User, status_code=status.HTTP_200_OK)
 def get_user(user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
@@ -60,8 +57,8 @@ def get_user(user_id: int):
     return user
 
 
-@app.post('/user', response_model=User, status_code=status.HTTP_201_CREATED)
-def create_user(user: UserIn):
+@app.post('/user', response_model=schemas.User, status_code=status.HTTP_201_CREATED)
+def create_user(user: schemas.UserIn):
 
     if user.username == "":
         raise HTTPException(
@@ -118,7 +115,7 @@ def get_user_timesheet(user_id: int):
     return timesheet_id
 
 
-@app.get('/user/{user_id}/timesheet/summary', response_model=Timesheet, status_code=status.HTTP_200_OK)
+@app.get('/user/{user_id}/timesheet/summary', response_model=schemas.Timesheet, status_code=status.HTTP_200_OK)
 def get_user_timesheet(user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
@@ -134,12 +131,12 @@ def get_user_timesheet(user_id: int):
     return timesheet
 
 
-@app.patch('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
-def update_user(user_id: int, new_user: User):
+@app.patch('/user/{user_id}', response_model=schemas.User, status_code=status.HTTP_202_ACCEPTED)
+def update_user(user_id: int, new_user: schemas.User):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     check_user = db.query(models.User).filter(
         models.User.username == new_user.username).first()
-    if check_user is not user:
+    if check_user is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="This username is already taken")
     user.username = new_user.username
@@ -151,7 +148,7 @@ def update_user(user_id: int, new_user: User):
     return user
 
 
-@app.delete('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
+@app.delete('/user/{user_id}', response_model=schemas.User, status_code=status.HTTP_202_ACCEPTED)
 def delete_user(user_id: int, authUserID: int):
 
     if not checkAdmin(authUserID):
@@ -174,7 +171,7 @@ def delete_user(user_id: int, authUserID: int):
 
 
 @app.post('/login', status_code=status.HTTP_200_OK)
-def user_login(user: UserLogin):
+def user_login(user: schemas.UserLogin):
     check_user = db.query(models.User).filter(
         models.User.username == user.username).first()
     if check_user is None:
@@ -189,14 +186,14 @@ def user_login(user: UserLogin):
 # Team endpoints ------------------
 
 
-@app.get('/team', response_model=List[Team], status_code=status.HTTP_200_OK)
+@app.get('/team', response_model=List[schemas.Team], status_code=status.HTTP_200_OK)
 def get_teams():
     teams = db.query(models.Team).all()
     return teams
 
 
 # Not used
-@app.get('/team/{team_id}', response_model=Team, status_code=status.HTTP_200_OK)
+@app.get('/team/{team_id}', response_model=schemas.Team, status_code=status.HTTP_200_OK)
 def get_team(team_id: int):
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
     if team is None:
@@ -205,8 +202,8 @@ def get_team(team_id: int):
     return team
 
 
-@app.post('/team', response_model=Team, status_code=status.HTTP_201_CREATED)
-def create_team(team: Team):
+@app.post('/team', response_model=schemas.Team, status_code=status.HTTP_201_CREATED)
+def create_team(team: schemas.Team):
 
     if team.teamname == "":
         raise HTTPException(
@@ -230,8 +227,8 @@ def create_team(team: Team):
 
 
 # Not used
-@app.put('/team/{team_id}', response_model=Team, status_code=status.HTTP_202_ACCEPTED)
-def update_team(team_id: int, new_team: Team):
+@app.put('/team/{team_id}', response_model=schemas.Team, status_code=status.HTTP_202_ACCEPTED)
+def update_team(team_id: int, new_team: schemas.Team):
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
 
     if team is None:
@@ -245,7 +242,7 @@ def update_team(team_id: int, new_team: Team):
     return (team)
 
 
-@app.delete('/team/{team_id}', response_model=Team, status_code=status.HTTP_202_ACCEPTED)
+@app.delete('/team/{team_id}', response_model=schemas.Team, status_code=status.HTTP_202_ACCEPTED)
 def delete_team(team_id: int, authUserID: int):
     if not checkAdmin(authUserID):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -253,13 +250,13 @@ def delete_team(team_id: int, authUserID: int):
 
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
 
-    if team.users != []:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Cannot delete team with users.")
-
     if team is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found.")
+
+    if team.users != []:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Cannot delete team with users.")
 
     db.delete(team)
     db.commit()
@@ -270,7 +267,7 @@ def delete_team(team_id: int, authUserID: int):
 
 
 # Not used
-@app.get("/timesheet", response_model=List[Timesheet], status_code=status.HTTP_200_OK)
+@app.get("/timesheet", response_model=List[schemas.Timesheet], status_code=status.HTTP_200_OK)
 def get_timesheets():
     timesheets = db.query(models.Timesheet).all()
     return timesheets
@@ -278,7 +275,7 @@ def get_timesheets():
 # Not used
 
 
-@app.get("/timesheet/{timesheet_id}", response_model=Timesheet)
+@app.get("/timesheet/{timesheet_id}", response_model=schemas.Timesheet)
 def get_timesheet(timesheet_id: int):
     timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.id == timesheet_id).first()
@@ -290,7 +287,7 @@ def get_timesheet(timesheet_id: int):
 # Not used
 
 
-@app.get("/timesheet/user/{user_id}", response_model=Timesheet)
+@app.get("/timesheet/user/{user_id}", response_model=schemas.Timesheet)
 def get_user_timesheet(user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
@@ -303,8 +300,8 @@ def get_user_timesheet(user_id: int):
 
 
 # Not used
-@app.post("/timesheet", response_model=Timesheet, status_code=status.HTTP_202_ACCEPTED)
-def create_timesheet(timesheet: Timesheet, ):
+@app.post("/timesheet", response_model=schemas.Timesheet, status_code=status.HTTP_202_ACCEPTED)
+def create_timesheet(timesheet: schemas.Timesheet, ):
     check_timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.owner == timesheet.owner).first()
     if check_timesheet is not None:
@@ -324,14 +321,14 @@ def create_timesheet(timesheet: Timesheet, ):
 
 
 # Not used
-@app.get("/entry", response_model=List[Entry], status_code=status.HTTP_200_OK)
+@app.get("/entry", response_model=List[schemas.Entry], status_code=status.HTTP_200_OK)
 def get_entries():
     entries = db.query(models.Entry).all()
     return entries
 
 
 # Not used
-@app.get("/entry/{entry_id}", response_model=Entry, status_code=status.HTTP_200_OK)
+@app.get("/entry/{entry_id}", response_model=schemas.Entry, status_code=status.HTTP_200_OK)
 def get_entry(entry_id: int):
     entry = db.query(models.Entry).filter(models.Entry.id == entry_id).first()
     if entry is None:
@@ -340,8 +337,8 @@ def get_entry(entry_id: int):
     return (entry)
 
 
-@app.post("/clock-in", response_model=Entry, status_code=status.HTTP_202_ACCEPTED)
-def clock_in(entry: Clock_req):
+@app.post("/clock-in", response_model=schemas.Entry, status_code=status.HTTP_202_ACCEPTED)
+def clock_in(entry: schemas.Clock_req):
     if entry.millis_in:
         time_in = datetime.fromtimestamp(entry.millis_in/1000.0)
     else:
@@ -352,6 +349,11 @@ def clock_in(entry: Clock_req):
             status_code=status.HTTP_400_BAD_REQUEST, detail="No clock-in time provided")
     timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.id == entry.timesheetID).first()
+
+    if timesheet is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Timesheet not found.")
+
     date = time_in.strftime("%x")
     # serach for clock-in date in existing records
     if any(entry.date == date for entry in timesheet.times):
@@ -371,8 +373,8 @@ def clock_in(entry: Clock_req):
     return new_entry
 
 
-@app.put("/clock-out", response_model=Entry, status_code=status.HTTP_200_OK)
-def clock_out(new_entry: Clock_req):
+@app.put("/clock-out", response_model=schemas.Entry, status_code=status.HTTP_202_ACCEPTED)
+def clock_out(new_entry: schemas.Clock_req):
 
     if new_entry.millis_out:
         time_out = datetime.fromtimestamp(
