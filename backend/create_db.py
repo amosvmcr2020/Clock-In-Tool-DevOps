@@ -60,6 +60,32 @@ teamLead_timesheet = models.Timesheet(
     owner=teamLead,
 )
 
+entry1 = models.Entry(
+    date="01/01/2022",
+    time_in="2022-01-01T09:30:00.0",
+    time_out="2022-01-01T17:00:00.0",
+    timesheetID=1
+)
+
+entry2 = models.Entry(
+    date="01/02/2022",
+    time_in="2022-01-02T09:30:00.0",
+    time_out="2022-01-02T17:30:00.0",
+    timesheetID=1
+)
+
+entry3 = models.Entry(
+    date="01/03/2022",
+    time_in="2022-01-03T09:30:00.0",
+    time_out="2022-01-03T16:30:00.0",
+    timesheetID=1
+)
+
+
+db.add(entry1)
+db.add(entry2)
+db.add(entry3)
+
 db.add(administrator)
 db.add(administrator_timesheet)
 db.add(john)
