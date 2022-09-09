@@ -3,10 +3,10 @@ from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-from schemas import *
+from .schemas import *
 
-from database import SessionLocal
-import models
+from .database import SessionLocal
+from . import models
 
 app = FastAPI()
 
