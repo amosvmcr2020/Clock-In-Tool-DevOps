@@ -9,6 +9,7 @@
 	import Success from "./components/success.svelte";
 	import Login from "./pages/login.svelte";
 	import PrivateRouteGuard from "./components/PrivateRouteGuard.svelte";
+	import Database from "./pages/database.svelte";
 
 	export let alerts = [];
 </script>
@@ -33,11 +34,14 @@
 		<Route path="/home">
 			<Home bind:alerts />
 		</Route>
-		<Route path="user">
+		<Route path="/user">
 			<User bind:alerts />
 		</Route>
 		<Route path="/team">
 			<Teams bind:alerts />
+		</Route>
+		<Route path="/database">
+			<Database />
 		</Route>
 	</PrivateRouteGuard>
 	<Route path="/login">
