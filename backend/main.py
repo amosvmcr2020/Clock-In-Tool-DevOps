@@ -1,3 +1,5 @@
+import hashlib
+
 from datetime import datetime
 from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,7 +10,8 @@ from .schemas import *
 from .database import SessionLocal
 from . import models
 
-app = FastAPI()
+app = FastAPI(title="Clock In API", swagger_ui_parameters={
+              "operationsSorter": "method"})
 
 origins = [
     "http://localhost",
@@ -27,9 +30,13 @@ app.add_middleware(
 db = SessionLocal()
 
 
-def hash(password):
-    hashed_password = password
-    return hashed_password
+def hashFunc(password):
+    return hashlib.sha1(password.encode("UTF-8")).hexdigest()
+
+
+def checkAdmin(userID):
+    user = db.query(models.User).filter(models.User.id == userID).first()
+    return user.hasAdmin
 
 
 @app.get('/')
@@ -59,6 +66,9 @@ def create_user(user: UserIn):
     if user.username == "":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username cannot be empty")
+    if user.password == "":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Password cannot be empty")
 
     check_user = db.query(models.User).filter(
         models.User.username == user.username).first()
@@ -74,7 +84,7 @@ def create_user(user: UserIn):
 
     new_user = models.User(
         username=user.username,
-        hashed_password=hash(user.password),
+        hashed_password=hashFunc(user.password),
         hasAdmin=user.hasAdmin,
         teamID=user.teamID
     )
@@ -129,7 +139,7 @@ def update_user(user_id: int, new_user: User):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     check_user = db.query(models.User).filter(
         models.User.username == new_user.username).first()
-    if check_user is not None:
+    if check_user is not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="This username is already taken")
     user.username = new_user.username
@@ -142,7 +152,11 @@ def update_user(user_id: int, new_user: User):
 
 
 @app.delete('/user/{user_id}', response_model=User, status_code=status.HTTP_202_ACCEPTED)
-def delete_user(user_id: int):
+def delete_user(user_id: int, authUserID: int):
+
+    if not checkAdmin(authUserID):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You must have admin priveledges to do this.")
     user = db.query(models.User).filter(models.User.id == user_id).first()
 
     if user is None:
@@ -166,7 +180,7 @@ def user_login(user: UserLogin):
     if check_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Username or password is incorrect.")
-    if user.password == check_user.hashed_password:
+    if hashFunc(user.password) == check_user.hashed_password:
         return check_user.id
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Username or password is incorrect.")
@@ -232,7 +246,11 @@ def update_team(team_id: int, new_team: Team):
 
 
 @app.delete('/team/{team_id}', response_model=Team, status_code=status.HTTP_202_ACCEPTED)
-def delete_team(team_id: int):
+def delete_team(team_id: int, authUserID: int):
+    if not checkAdmin(authUserID):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You must have admin priveledges to do this.")
+
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
 
     if team.users != []:
