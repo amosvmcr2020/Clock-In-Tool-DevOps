@@ -169,6 +169,7 @@ def delete_user(user_id: int, authUserID: int):
     return (user)
 
 
+# Endpoint used to validate login credentials
 @app.post('/login', status_code=status.HTTP_200_OK)
 def user_login(user: schemas.UserLogin):
     check_user = db.query(models.User).filter(

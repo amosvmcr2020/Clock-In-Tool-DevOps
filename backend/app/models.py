@@ -1,5 +1,5 @@
 from . import database
-from sqlalchemy import String, Boolean, Integer, Column, Text, ForeignKey, DateTime
+from sqlalchemy import String, Boolean, Integer, Column, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 
@@ -16,9 +16,6 @@ class User(database.Base):
         "Timesheet", back_populates="owner", uselist=False)
     team = relationship("Team", back_populates="users", uselist=False)
 
-    def __repr__(self):
-        return f"{self.id} : {self.username} is an Admin" if self.hasAdmin else f"{id} : {self.username} is not an Admin"
-
 
 class Team(database.Base):
     __tablename__ = "teams"
@@ -26,9 +23,6 @@ class Team(database.Base):
     teamname = Column(String(255), nullable=False, unique=True)
 
     users = relationship("User", back_populates="team")
-
-    def __repr__(self):
-        return self.teamname
 
 
 class Timesheet(database.Base):
