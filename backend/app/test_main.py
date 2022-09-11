@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from .main import app
-from .create_db import create_new_db
+from .create_test_db import create_new_db
 
 client = TestClient(app)
 

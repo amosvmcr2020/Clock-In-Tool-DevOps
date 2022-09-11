@@ -1,6 +1,6 @@
-from .database import Base, engine
-from . import models
-from .database import SessionLocal
+from app.database import Base, engine
+from app import models
+from app.database import SessionLocal
 import hashlib
 
 
