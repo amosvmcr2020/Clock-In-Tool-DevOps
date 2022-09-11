@@ -108,9 +108,8 @@ def get_user_timesheet(user_id: int):
     timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.owner == user).first()
     if timesheet is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User does not have a timesheet."
-        )
+        # If the user doesn't have a timesheet, create one.
+        timesheet = models.Timesheet(owner=user)
     timesheet_id = timesheet.id
     return timesheet_id
 
@@ -315,7 +314,7 @@ def get_user_timesheet(user_id: int):
 
 # Not used
 @app.post("/timesheet", response_model=schemas.Timesheet, status_code=status.HTTP_202_ACCEPTED)
-def create_timesheet(timesheet: schemas.Timesheet, ):
+def create_timesheet(timesheet: schemas.Timesheet):
     check_timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.owner == timesheet.owner).first()
     if check_timesheet is not None:
@@ -330,6 +329,29 @@ def create_timesheet(timesheet: schemas.Timesheet, ):
     db.commit()
 
     return (new_timesheet)
+
+
+@app.delete("/timesheet/{timesheet_id}", response_model=schemas.Timesheet, status_code=status.HTTP_202_ACCEPTED)
+def delete_timesheet(timesheet_id: int):
+    timesheet = db.query(models.Timesheet).filter(
+        models.Timesheet.id == timesheet_id).first()
+    if timesheet is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Timesheet not found.")
+    db.delete(timesheet)
+    db.commit()
+    return timesheet
+
+
+@app.delete("/timesheet/{timesheet_id}/clear", response_model=List[schemas.Entry], status_code=status.HTTP_202_ACCEPTED)
+def clear_timesheet(timesheet_id: int):
+    entries = db.query(models.Entry).filter(
+        models.Entry.timesheetID == timesheet_id).all()
+    print(entries)
+    for entry in entries:
+        db.delete(entry)
+    db.commit()
+    return entries
 
 # Entry endpoints ------------------
 
