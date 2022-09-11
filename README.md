@@ -15,6 +15,8 @@ Meanwhile the actual CRUD actions can be seen in the following files:
 
 All of the API endpoints can be found in the `main.py` file, which define how the user can interact with the database. Additionally, lots of validation is involved in this file so that there is minimal risk of any user fault. 
 
+The backend is tested using the pytest framework. Pytest can be used to write a series of unit tests to ensure that the application is running as expected. Within the `test_main.py` file are tests that attempt to call the API with proper responses, as well as improper to ensure the error handling is working correctly. 
+
 ## Running the backend
 ### All of the following should be done from the backend:
 `cd backend`
