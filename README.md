@@ -19,19 +19,19 @@ All of the API endpoints can be found in the `main.py` file, which define how th
 ### All of the following should be done from the backend:
 `cd backend`
 
-* Creating and running the python environment
-`python3 -m venv env`
+* Creating and running the python environment: 
+`python3 -m venv env` &
 `source env/bin/activate`
 
-* Pip install the required packages
+* Pip install the required packages: 
 `pip install -r requirements.txt`
 
 
-* Create db
+* Create db: 
 `python3 create_db.py`
-* Running the API
+* Running the API: 
 `uvicorn main:app --reload`
-* Test the app
+* Test the app: 
 `pytest`
 
 ## About the frontend
@@ -41,7 +41,7 @@ The frontend is written using the Svelte framework, a javascript framework that 
 ### All of the following should be done from the frontend: 
 `cd frontend`
 
-* Installing required javascript packages
+* Installing required javascript packages:
 `npm install`
-* Running the UI
+* Running the UI:
 `npm start`
