@@ -116,7 +116,7 @@
             return;
         }
         if (!check_admin($current_user_id)) {
-            alerts.push("Error", "You do not have admin priveleges.");
+            alerts.push(["Error", "You do not have admin priveleges."]);
             alerts = alerts;
             return;
         }
@@ -135,10 +135,42 @@
                     hasAdmin: data.hasAdmin,
                     teamID: data.teamID,
                 })
-                .then(() => alerts.push("Success", "User edited successfully"));
+                .then(() =>
+                    alerts.push(["Success", "User edited successfully"])
+                );
+            alerts = alerts;
             get_teams();
             toggleModal(0);
         } catch (error) {
+            alerts.push(["Error", error.response.data.detail]);
+            alerts = alerts;
+        }
+    };
+    let editable = 0;
+    const toggleEdit = (id) => {
+        editable = id;
+        alerts = alerts;
+    };
+    const editTeam = async (e) => {
+        const formData = new FormData(e.target);
+
+        const data = {};
+        for (let field of formData) {
+            const [key, value] = field;
+            data[key] = value;
+        }
+
+        try {
+            await axios
+                .patch(`http://localhost:8000/team/${editable}`, {
+                    teamname: data.teamname,
+                })
+                .then(() => alerts.push(["Success", "Teamname Updated"]));
+            alerts = alerts;
+            get_teams();
+            toggleEdit(0);
+        } catch (error) {
+            console.log(error);
             alerts.push(["Error", error.response.data.detail]);
             alerts = alerts;
         }
@@ -152,10 +184,27 @@
             <input name="teamname" placeholder="Team Name" type="text" />
             <input type="submit" value="Create new team" />
         </form>
+        <p>
+            View the current teams below. If you would like to change a team
+            name, please double click the name.
+        </p>
 
         {#each team_list as team}
-            <div class="team-header">
-                {team.teamname}
+            <div class="team-header" on:dblclick={() => toggleEdit(team.id)}>
+                {#if editable == team.id}
+                    <form on:submit|preventDefault={editTeam}>
+                        <input
+                            on:blur={() => toggleEdit("")}
+                            autofocus
+                            class="teamname-form"
+                            name="teamname"
+                            value={team.teamname}
+                            type="text"
+                        />
+                    </form>
+                {:else}
+                    {team.teamname}
+                {/if}
                 <button
                     class="deleteButton"
                     on:click={() => delete_team(team.id)}
@@ -263,8 +312,14 @@
         align-items: center;
     }
 
-    table {
-        text-align: center;
+    .teamname-form {
+        background: var(--primary);
+        color: var(--text);
+        text-transform: capitalize;
+        font-size: 32px;
+        font-weight: 100;
+        width: fit-content;
+        border: none;
     }
     .edit_button {
         font-size: 32px;

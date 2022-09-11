@@ -188,7 +188,7 @@ def user_login(user: schemas.UserLogin):
 
 @app.get('/team', response_model=List[schemas.Team], status_code=status.HTTP_200_OK)
 def get_teams():
-    teams = db.query(models.Team).all()
+    teams = db.query(models.Team).order_by(models.Team.teamname.asc()).all()
     return teams
 
 
@@ -240,14 +240,19 @@ def get_user_team(user_id: int):
     return team
 
 
-# Not used
-@app.put('/team/{team_id}', response_model=schemas.Team, status_code=status.HTTP_202_ACCEPTED)
+@app.patch('/team/{team_id}', response_model=schemas.Team, status_code=status.HTTP_202_ACCEPTED)
 def update_team(team_id: int, new_team: schemas.Team):
     team = db.query(models.Team).filter(models.Team.id == team_id).first()
 
     if team is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found.")
+
+    check_team = db.query(models.Team).filter(
+        models.Team.teamname == new_team.teamname).first()
+    if check_team is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Team name already in use.")
 
     team.teamname = new_team.teamname
 
