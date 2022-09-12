@@ -149,7 +149,6 @@
     let editable = 0;
     const toggleEdit = (id) => {
         editable = id;
-        alerts = alerts;
     };
     const editTeam = async (e) => {
         const formData = new FormData(e.target);
@@ -174,6 +173,14 @@
             alerts.push(["Error", error.response.data.detail]);
             alerts = alerts;
         }
+    };
+
+    const is_online = async (userID) => {
+        let response = false;
+        await axios
+            .get(`http://localhost:8000/user/${userID}/online`)
+            .then((res) => (response = res));
+        return response;
     };
 </script>
 
@@ -217,6 +224,7 @@
             {:else}
                 <table>
                     <tr>
+                        <th>Online</th>
                         <th>Username</th>
                         <th>Role</th>
                         <th>Edit</th>
@@ -229,6 +237,21 @@
                                     ? "current"
                                     : ""}
                             >
+                                <td class="small_column">
+                                    {#await is_online(user.id) then isOnline}
+                                        <div class="icon">
+                                            {#if isOnline.data == true}
+                                                <Icon
+                                                    icon="charm:circle-tick"
+                                                />
+                                            {:else}
+                                                <Icon
+                                                    icon="fluent:presence-offline-10-regular"
+                                                />
+                                            {/if}
+                                        </div>
+                                    {/await}
+                                </td>
                                 <td>
                                     {user.username}
                                     <strong>
@@ -300,6 +323,9 @@
 </div>
 
 <style>
+    .icon {
+        font-size: 32px;
+    }
     .team-header {
         margin: 20px;
         color: var(--text);
@@ -318,7 +344,6 @@
         text-transform: capitalize;
         font-size: 32px;
         font-weight: 100;
-        width: fit-content;
         border: none;
     }
     .edit_button {
@@ -340,88 +365,5 @@
 
     .current:hover {
         background: var(--alt-ternary);
-        animation: wash 0.2s ease-in-out forwards;
-    }
-
-    @keyframes wash {
-        0% {
-            background: var(--primary);
-        }
-
-        10% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 90%
-            );
-        }
-
-        20% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 80%
-            );
-        }
-
-        30% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 70%
-            );
-        }
-
-        40% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 60%
-            );
-        }
-
-        50% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 50%
-            );
-        }
-
-        60% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 40%
-            );
-        }
-
-        70% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 30%
-            );
-        }
-
-        80% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 20%
-            );
-        }
-
-        90% {
-            background: linear-gradient(
-                -90deg,
-                var(--ternary),
-                var(--alt-ternary) 10%
-            );
-        }
-
-        100% {
-            background: var(--alt-ternary);
-        }
     }
 </style>

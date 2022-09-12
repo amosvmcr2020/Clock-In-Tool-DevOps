@@ -25,13 +25,13 @@
                                 No data in this table.
                             {:else}
                                 <tr>
-                                    {#each Object.values(row) as val}
-                                        {#if val == null}
-                                            <td>{val}</td>
-                                        {:else if typeof val == "object"}
-                                            <td>{JSON.stringify(val)}</td>
+                                    {#each Object.keys(row) as key}
+                                        {#if row[key] == null}
+                                            <td>{row[key]}</td>
+                                        {:else if typeof row[key] == "object"}
+                                            <td> Object of {key} </td>
                                         {:else}
-                                            <td>{val}</td>
+                                            <td>{row[key]}</td>
                                         {/if}
                                     {/each}
                                 </tr>
@@ -82,7 +82,7 @@
 
     .flipped {
         position: absolute;
-        width: 80%;
+        width: 90%;
         min-height: 300px;
         background: var(--primary);
     }

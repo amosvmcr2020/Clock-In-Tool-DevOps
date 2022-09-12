@@ -8,6 +8,7 @@
     let entryTable = [];
 
     const get_users = async () => {
+        userTable = [];
         await axios.get(`http://localhost:8000/user`).then((res) => {
             userTable = ["User"];
             for (let i = 0; i < res.data.length; i++) {
@@ -17,6 +18,8 @@
     };
 
     const get_teams = async () => {
+        teamTable = [];
+        console.log(teamTable);
         await axios.get(`http://localhost:8000/team`).then((res) => {
             teamTable.push("Team");
             for (let i = 0; i < res.data.length; i++) {
@@ -26,6 +29,7 @@
     };
 
     const get_timesheet = async () => {
+        timesheetTable = [];
         await axios.get(`http://localhost:8000/timesheet`).then((res) => {
             timesheetTable.push("Timesheet");
             for (let i = 0; i < res.data.length; i++) {
@@ -35,6 +39,7 @@
     };
 
     const get_entries = async () => {
+        entryTable = [];
         await axios.get(`http://localhost:8000/entry`).then((res) => {
             entryTable.push("Entry");
             for (let i = 0; i < res.data.length; i++) {
@@ -42,11 +47,6 @@
             }
         });
     };
-
-    get_users();
-    get_teams();
-    get_timesheet();
-    get_entries();
 </script>
 
 <div class="page">

@@ -115,7 +115,7 @@ def get_user_timesheet(user_id: int):
 
 
 @app.get('/user/{user_id}/timesheet/summary', response_model=schemas.Timesheet, status_code=status.HTTP_200_OK)
-def get_user_timesheet(user_id: int):
+def get_user_timesheet_summary(user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
         raise HTTPException(
@@ -167,6 +167,24 @@ def delete_user(user_id: int, authUserID: int):
     db.commit
 
     return (user)
+
+
+# Endpoint to check if queried user is currently online
+@app.get('/user/{user_id}/online', response_model=bool, status_code=status.HTTP_200_OK)
+def check_online(user_id):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+    timesheet = db.query(models.Timesheet).filter(
+        models.Timesheet.owner == user).first()
+    date = datetime.now().strftime("%x")
+    entry = db.query(models.Entry).filter(models.Entry.timesheetID ==
+                                          timesheet.id).filter(models.Entry.date == date).first()
+    if entry is not None:
+        if entry.time_out is None:
+            return True
+    return False
 
 
 # Endpoint used to validate login credentials
