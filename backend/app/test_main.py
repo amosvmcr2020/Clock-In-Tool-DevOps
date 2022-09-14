@@ -96,16 +96,6 @@ def test_duplicate_create_user():
     assert response.json() == {"detail": "This username is already in use."}
 
 
-'''Following test not working WHY'''
-# # Test edit user
-# def test_edit_user():
-#     response = client.patch(
-#         "/user/4", json={"username": "newer_user", "teamID": 2, "hasAdmin": True})
-#     assert response.status_code == 202
-#     assert response.json() == {
-#         "id": 4, "username": "newer_user", "teamID": 2, "hasAdmin": True}
-
-
 # Test delete user
 def test_delete_user():
     response = client.delete("/user/4?authUserID=1")
@@ -221,14 +211,14 @@ def test_get_team():
 
 # Test edit team
 def test_edit_team():
-    response = client.put("team/1", json={"teamname": "Test Team"})
+    response = client.patch("team/1", json={"teamname": "Test Team"})
     assert response.status_code == 202
     assert response.json() == {
         "id": 1,
         "teamname": "Test Team",
         "users": [
             {
-                    "id": 1,
+                "id": 1,
                 "username": "Administrator",
                 "hasAdmin": True,
                 "teamID": 1
@@ -322,7 +312,7 @@ def test_no_timesheet_clock_in():
 
 # Test clock out
 def test_clock_out():
-    response = client.put(
+    response = client.patch(
         "/clock-out", json={"millis_out": 1662739200000, "timesheetID": 1})
     assert response.status_code == 202
     assert response.json() == {
@@ -336,7 +326,7 @@ def test_clock_out():
 
 # Test clock out twice in one day
 def test_duplicate_clock_out():
-    response = client.put(
+    response = client.patch(
         "/clock-out", json={"millis_out": 1662739200000, "timesheetID": 1})
     assert response.status_code == 400
     assert response.json() == {
@@ -346,7 +336,7 @@ def test_duplicate_clock_out():
 
 # Test clock out without clocking in
 def test_clock_out_without_clock_in():
-    response = client.put(
+    response = client.patch(
         "/clock-out", json={"millis_out": 1662825600000, "timesheetID": 99})
     assert response.status_code == 400
     assert response.json() == {

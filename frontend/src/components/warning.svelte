@@ -12,7 +12,7 @@
 <style>
     .warning-container {
         margin: 1%;
-        height: fit-content;
+        height: 20px;
         border-radius: 10px;
         background: var(--alt-danger);
         display: flex;
@@ -26,8 +26,9 @@
         position: absolute;
         right: 0;
         z-index: 99;
-        width: 40%;
-        animation: slide-in 4s ease-in forwards;
+        width: fit-content;
+        max-width: 40%;
+        animation: slide-in 5s ease-in forwards;
     }
 
     .symbol {

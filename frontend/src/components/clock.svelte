@@ -24,7 +24,7 @@
                 let timesheet_id = await get_timesheet_id(userID);
 
                 await axios
-                    .put(`http://localhost:8000/clock-out`, {
+                    .patch(`http://localhost:8000/clock-out`, {
                         millis_out: curr_time,
                         timesheetID: timesheet_id,
                     })

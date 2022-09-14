@@ -141,7 +141,6 @@
                         timesheetID: "",
                     });
                 }
-                console.log(entryTable);
                 timesheetTable = [
                     "Timesheet",
                     {
@@ -171,7 +170,7 @@
                 <button on:click={() => toggleModal()}> Log in </button>
             {/if}
         </div>
-        <form on:submit|preventDefault={get_user_summary}>
+        <form autocomplete="off" on:submit|preventDefault={get_user_summary}>
             If you would like to view a user's table, query them below:
             <div class="formContainer">
                 <select name="userID" id="username">
@@ -187,6 +186,10 @@
         <div class="subtitle">
             {userTable[1].username}
         </div>
+        <p>
+            Explore {userTable[1].username}'s tables. Click on a table to view
+            the records within it!
+        </p>
         <div class="tables">
             <DataTable bind:data={teamTable} />
             <p>1-∞</p>
@@ -204,7 +207,11 @@
             {#if login}
                 <div class="page-title">Log In</div>
                 <div class="modalFormContainer">
-                    <form class="modalForm" on:submit|preventDefault={onSubmit}>
+                    <form
+                        autocomplete="off"
+                        class="modalForm"
+                        on:submit|preventDefault={onSubmit}
+                    >
                         <label for="username">Username</label>
                         <input
                             type="text"
@@ -231,7 +238,11 @@
             {:else}
                 <div class="page-title">Create User</div>
                 <div class="modalFormContainer">
-                    <form class="modalForm" on:submit|preventDefault={onSubmit}>
+                    <form
+                        autocomplete="off"
+                        class="modalForm"
+                        on:submit|preventDefault={onSubmit}
+                    >
                         <label for="username">Username</label>
                         <input
                             type="text"

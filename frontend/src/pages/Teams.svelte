@@ -51,8 +51,8 @@
                     `http://localhost:8000/user/${user_id}?authUserID=${$current_user_id}`
                 )
                 .then(() => alerts.push(["Success", "User Deleted"]));
-            alerts = alerts;
             get_teams();
+            alerts = alerts;
         } catch (error) {
             alerts.push(["Error", error.response.data.detail]);
             alerts = alerts;
@@ -169,7 +169,6 @@
             get_teams();
             toggleEdit(0);
         } catch (error) {
-            console.log(error);
             alerts.push(["Error", error.response.data.detail]);
             alerts = alerts;
         }
@@ -187,7 +186,7 @@
 <div class="page">
     <div class="page-title">Teams</div>
     <div class="content">
-        <form on:submit|preventDefault={create_team}>
+        <form autocomplete="off" on:submit|preventDefault={create_team}>
             <input name="teamname" placeholder="Team Name" type="text" />
             <input type="submit" value="Create new team" />
         </form>
@@ -199,7 +198,10 @@
         {#each team_list as team}
             <div class="team-header" on:dblclick={() => toggleEdit(team.id)}>
                 {#if editable == team.id}
-                    <form on:submit|preventDefault={editTeam}>
+                    <form
+                        autocomplete="off"
+                        on:submit|preventDefault={editTeam}
+                    >
                         <input
                             on:blur={() => toggleEdit("")}
                             autofocus
@@ -224,7 +226,7 @@
             {:else}
                 <table>
                     <tr>
-                        <th>Online</th>
+                        <th>Clocked In</th>
                         <th>Username</th>
                         <th>Role</th>
                         <th>Edit</th>
@@ -296,7 +298,11 @@
             <button class="close" on:click={() => toggleModal(0)}>X</button>
             <div class="page-title">Edit User</div>
             <div class="modalFormContainer">
-                <form class="modalForm" on:submit|preventDefault={editUser}>
+                <form
+                    autocomplete="off"
+                    class="modalForm"
+                    on:submit|preventDefault={editUser}
+                >
                     <label for="username">Username</label>
                     <input type="text" name="username" placeholder="Username" />
                     <!-- Change this to a switch -->

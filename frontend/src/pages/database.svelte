@@ -19,7 +19,6 @@
 
     const get_teams = async () => {
         teamTable = [];
-        console.log(teamTable);
         await axios.get(`http://localhost:8000/team`).then((res) => {
             teamTable.push("Team");
             for (let i = 0; i < res.data.length; i++) {
@@ -51,7 +50,10 @@
 
 <div class="page">
     <div class="page-title">Database</div>
-
+    <p>
+        Explore the database tables. Click on a table to view the records within
+        it!
+    </p>
     <div class="tables">
         {#await get_teams() then _}
             <DataTable bind:data={teamTable} />
@@ -77,7 +79,7 @@
         flex-direction: row;
         width: 100%;
         align-items: center;
-        margin-top: 20%;
+        margin-top: 5%;
     }
 
     p {

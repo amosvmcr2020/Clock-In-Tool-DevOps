@@ -78,7 +78,11 @@
     {#if login}
         <div class="page-title">Login</div>
         <div class="">
-            <form class="modalForm" on:submit|preventDefault={onSubmit}>
+            <form
+                autocomplete="off"
+                class="modalForm"
+                on:submit|preventDefault={onSubmit}
+            >
                 <label for="username">Username</label>
                 <input type="text" name="username" placeholder="Username" />
 
@@ -95,7 +99,11 @@
     {:else}
         <div class="page-title">Create User</div>
         <div class="">
-            <form class="modalForm" on:submit|preventDefault={onSubmit}>
+            <form
+                autocomplete="off"
+                class="modalForm"
+                on:submit|preventDefault={onSubmit}
+            >
                 <label for="username">Username</label>
                 <input type="text" name="username" placeholder="Username" />
                 <label for="username">Password</label>
