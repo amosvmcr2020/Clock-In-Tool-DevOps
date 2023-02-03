@@ -1,9 +1,9 @@
 <script>
 	import { Router, Route } from "svelte-navigator";
 
-	import Home from "./pages/Home.svelte";
+	import Home from "./pages/home.svelte";
 	import Teams from "./pages/Teams.svelte";
-	import TopBar from "./components/TopBar.svelte";
+	import TopBar from "./components/topBar.svelte";
 	import User from "./pages/user.svelte";
 	import Warning from "./components/warning.svelte";
 	import Success from "./components/success.svelte";

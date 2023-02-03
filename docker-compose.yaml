@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  backend:
+    build: ./backend
+    # command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://fastapi_traefik:fastapi_traefik@db:5432/fastapi_traefik
+    depends_on:
+      - db
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:8080"
+  db:
+    image: postgres:15-alpine
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=fastapi_traefik
+      - POSTGRES_PASSWORD=fastapi_traefik
+      - POSTGRES_DB=fastapi_traefik

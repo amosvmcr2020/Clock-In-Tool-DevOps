@@ -5,13 +5,12 @@ from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-from . import schemas, database, models
+from . import schemas, database, models, create_test_db
 
 app = FastAPI(title="Clock In API")
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
+    "http://0.0.0.0:8080",
 ]
 
 app.add_middleware(
@@ -24,6 +23,8 @@ app.add_middleware(
 
 
 db = database.SessionLocal()
+
+create_test_db.create_new_db()
 
 
 def hashFunc(password):

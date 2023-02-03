@@ -2,9 +2,10 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from .config import settings
 
 engine = create_engine(
-    "postgresql://postgres:password@localhost/Timesheet", echo=True)
+    settings.db_url, echo=True)
 
 Base = declarative_base()
 
