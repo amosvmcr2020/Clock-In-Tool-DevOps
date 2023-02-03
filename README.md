@@ -17,7 +17,7 @@ All of the API endpoints can be found in the `main.py` file, which define how th
 
 The backend is tested using the pytest framework. Pytest can be used to write a series of unit tests to ensure that the application is running as expected. Within the `test_main.py` file are tests that attempt to call the API with proper responses, as well as improper to ensure the error handling is working correctly. 
 
-Before each test, the `create_test_db.py` script is run. This script, similarly to the `create_db.py` script, drops all existing tables and creates the four new ones populated by 2 teams, colectively containing 3 users. Each user has a timesheet allocated to them and the Administrator has 3 entries added to their timesheet. 
+Within the test file, the `create_test_db.py` script is run. This script, similarly to the `create_db.py` script, drops all existing tables and creates the four new ones populated by 2 teams, colectively containing 3 users. Each user has a timesheet allocated to them and the Administrator has 3 entries added to their timesheet. 
 
 ## Running the backend
 ### All of the following should be done from the backend:
@@ -34,7 +34,7 @@ Before each test, the `create_test_db.py` script is run. This script, similarly 
 * Create db: 
 `python3 create_db.py`
 * Running the API: 
-`uvicorn main:app --reload`
+`uvicorn app.main:app --reload`
 * Test the app: 
 `pytest`
 

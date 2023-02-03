@@ -7,8 +7,7 @@ from typing import List
 
 from . import schemas, database, models
 
-app = FastAPI(title="Clock In API", swagger_ui_parameters={
-              "operationsSorter": "method"})
+app = FastAPI(title="Clock In API")
 
 origins = [
     "http://localhost",
@@ -357,7 +356,10 @@ def create_timesheet(timesheet: schemas.Timesheet):
 
 
 @app.delete("/timesheet/{timesheet_id}", response_model=schemas.Timesheet, status_code=status.HTTP_202_ACCEPTED)
-def delete_timesheet(timesheet_id: int):
+def delete_timesheet(timesheet_id: int, authUserID: int):
+    if not checkAdmin(authUserID):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You must have admin priveledges to do this.")
     timesheet = db.query(models.Timesheet).filter(
         models.Timesheet.id == timesheet_id).first()
     if timesheet is None:
@@ -370,7 +372,10 @@ def delete_timesheet(timesheet_id: int):
 
 # Delete all entries within the requested timesheet
 @app.delete("/timesheet/{timesheet_id}/clear", response_model=List[schemas.Entry], status_code=status.HTTP_202_ACCEPTED)
-def clear_timesheet(timesheet_id: int):
+def clear_timesheet(timesheet_id: int, authUserID: int):
+    if not checkAdmin(authUserID):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You must have admin priveledges to do this.")
     entries = db.query(models.Entry).filter(
         models.Entry.timesheetID == timesheet_id).all()
     print(entries)
