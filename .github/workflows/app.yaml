@@ -36,4 +36,16 @@ jobs:
             uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
           base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
           branch: actions/black
+  Pytest:
+    runs-on: ubuntu-latest
+      defaults: 
+        run: 
+          working-directory: backend
+      steps:
+        - name: Set up Python
+          uses: actions/setup-python@main
+          with:
+            python-version: "3.10"
+        - name: Run pytest summary
+          uses: dariocurr/pytest-summary@main
 
