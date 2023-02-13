@@ -37,6 +37,10 @@ jobs:
           base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
           branch: actions/blac
   DockerUI:
+    runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        packages: write
     defaults: 
       run: 
         working-directory: backend
