@@ -1,5 +1,7 @@
 FROM python:3.9
 
+LABEL name="backend"
+
 WORKDIR /
 
 COPY . /

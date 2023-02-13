@@ -12,8 +12,7 @@ class User(database.Base):
     teamID = Column(Integer, ForeignKey("teams.id"), nullable=False)
     timesheetID = Column(Integer, ForeignKey("timesheets.id"), nullable=False)
 
-    timesheet = relationship(
-        "Timesheet", back_populates="owner", uselist=False)
+    timesheet = relationship("Timesheet", back_populates="owner", uselist=False)
     team = relationship("Team", back_populates="users", uselist=False)
 
 
@@ -43,5 +42,4 @@ class Entry(database.Base):
     time_out = Column(DateTime, nullable=True)
     timesheetID = Column(Integer, ForeignKey("timesheets.id"), nullable=False)
 
-    timesheet = relationship(
-        "Timesheet", back_populates="times", uselist=False)
+    timesheet = relationship("Timesheet", back_populates="times", uselist=False)
