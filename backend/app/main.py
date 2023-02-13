@@ -28,7 +28,7 @@ create_test_db.create_new_db()
 
 
 def hashFunc(password):
-    return hashlib.sha1(password.encode("UTF-8")).hexdigest()
+    return hashlib.sha256(password.encode("UTF-8")).hexdigest()
 
 
 def checkAdmin(userID):

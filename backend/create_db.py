@@ -6,7 +6,7 @@ import hashlib
 
 def create_new_db():
     def hashFunc(password):
-        return hashlib.sha1(password.encode("UTF-8")).hexdigest()
+        return hashlib.sha256(password.encode("UTF-8")).hexdigest()
 
     print("Dropping existing database...")
     Base.metadata.drop_all(engine)
