@@ -1,6 +1,10 @@
 name: CI
 on: push
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   Lint:
     runs-on: ubuntu-latest
