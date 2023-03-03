@@ -3,7 +3,7 @@
 ## About the backend
 
 The backend has been written using FastAPI, a Python framework for creating restful applications. FastAPI was chosen due to its vast documentation alogside the automatically generated docs for the API itself. Once running, these are available at the "/docs" or the "/redoc" endpoint of the api. For example:
-`http://localhost:8000/docs`
+`http://0.0.0.0:8000/docs`
 
 To link the Python API to the postgres database, SQLAlchemy was used. This enables simple connections and removes any need for proper SQL knowledge, only Python. The setup of the database using SQLAlchemy can be seen in the following files:
 

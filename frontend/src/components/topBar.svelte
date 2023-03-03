@@ -16,7 +16,7 @@
             return false;
         }
         await axios
-            .get(`http://localhost:8000/user/${userID}`)
+            .get(`http://0.0.0.0:8000/user/${userID}`)
             .then((res) => (hasAdmin = res.data.hasAdmin));
         return hasAdmin;
     };

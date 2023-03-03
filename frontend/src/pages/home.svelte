@@ -13,14 +13,14 @@
 
     const get_timesheet = async (user_id) => {
         await axios
-            .get(`http://localhost:8000/user/${user_id}/timesheet/summary`)
+            .get(`http://0.0.0.0:8000/user/${user_id}/timesheet/summary`)
             .then((res) => (times = res.data.times));
         times = times;
     };
 
     const get_current_user = async () => {
         await axios
-            .get(`http://localhost:8000/user/${$current_user_id}`)
+            .get(`http://0.0.0.0:8000/user/${$current_user_id}`)
             .then((res) => (user = res.data));
         return user;
     };

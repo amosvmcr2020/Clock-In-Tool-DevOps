@@ -18,7 +18,7 @@
 
     const get_teams = async () => {
         await axios
-            .get(`http://localhost:8000/team`)
+            .get(`http://0.0.0.0:8000/team`)
             .then((res) => (team_list = res.data));
     };
 
@@ -28,7 +28,7 @@
         let userID = current_user;
         let hasAdmin = false;
         await axios
-            .get(`http://localhost:8000/user/${userID}`)
+            .get(`http://0.0.0.0:8000/user/${userID}`)
             .then((res) => (hasAdmin = res.data.hasAdmin));
         return hasAdmin;
     };
@@ -48,7 +48,7 @@
         try {
             await axios
                 .delete(
-                    `http://localhost:8000/user/${user_id}?authUserID=${$current_user_id}`
+                    `http://0.0.0.0:8000/user/${user_id}?authUserID=${$current_user_id}`
                 )
                 .then(() => alerts.push(["Success", "User Deleted"]));
             get_teams();
@@ -69,7 +69,7 @@
         try {
             await axios
                 .delete(
-                    `http://localhost:8000/team/${teamID}?authUserID=${$current_user_id}`
+                    `http://0.0.0.0:8000/team/${teamID}?authUserID=${$current_user_id}`
                 )
                 .then(() => alerts.push(["Success", "Team Deleted"]));
             alerts = alerts;
@@ -95,7 +95,7 @@
         }
         try {
             await axios
-                .post(`http://localhost:8000/team`, {
+                .post(`http://0.0.0.0:8000/team`, {
                     teamname: data.teamname,
                 })
                 .then(() =>
@@ -130,7 +130,7 @@
 
         try {
             await axios
-                .patch(`http://localhost:8000/user/${target_user}`, {
+                .patch(`http://0.0.0.0:8000/user/${target_user}`, {
                     username: data.username,
                     hasAdmin: data.hasAdmin,
                     teamID: data.teamID,
@@ -161,7 +161,7 @@
 
         try {
             await axios
-                .patch(`http://localhost:8000/team/${editable}`, {
+                .patch(`http://0.0.0.0:8000/team/${editable}`, {
                     teamname: data.teamname,
                 })
                 .then(() => alerts.push(["Success", "Teamname Updated"]));
@@ -177,7 +177,7 @@
     const is_online = async (userID) => {
         let response = false;
         await axios
-            .get(`http://localhost:8000/user/${userID}/online`)
+            .get(`http://0.0.0.0:8000/user/${userID}/online`)
             .then((res) => (response = res));
         return response;
     };

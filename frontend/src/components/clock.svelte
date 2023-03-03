@@ -9,7 +9,7 @@
     const get_timesheet_id = async (userID) => {
         let id;
         await axios
-            .get(`http://localhost:8000/user/${userID}/timesheet`)
+            .get(`http://0.0.0.0:8000/user/${userID}/timesheet`)
             .then((res) => (id = res.data));
 
         return id;
@@ -24,7 +24,7 @@
                 let timesheet_id = await get_timesheet_id(userID);
 
                 await axios
-                    .patch(`http://localhost:8000/clock-out`, {
+                    .patch(`http://0.0.0.0:8000/clock-out`, {
                         millis_out: curr_time,
                         timesheetID: timesheet_id,
                     })
@@ -49,7 +49,7 @@
 
             try {
                 await axios
-                    .post(`http://localhost:8000/clock-in`, {
+                    .post(`http://0.0.0.0:8000/clock-in`, {
                         millis_in: curr_time,
                         timesheetID: timesheet_id,
                     })

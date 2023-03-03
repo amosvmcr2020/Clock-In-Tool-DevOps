@@ -15,20 +15,20 @@
     const get_user = async (user_id) => {
         let user;
         await axios
-            .get(`http://localhost:8000/user/${user_id}`)
+            .get(`http://0.0.0.0:8000/user/${user_id}`)
             .then((res) => (user = res.data));
         return user;
     };
 
     const get_users = async () => {
         await axios
-            .get(`http://localhost:8000/user`)
+            .get(`http://0.0.0.0:8000/user`)
             .then((res) => (user_list = res.data));
     };
 
     const get_teams = async () => {
         await axios
-            .get(`http://localhost:8000/team`)
+            .get(`http://0.0.0.0:8000/team`)
             .then((res) => (team_list = res.data));
         team_list = team_list;
     };
@@ -53,7 +53,7 @@
         if (login) {
             try {
                 await axios
-                    .post(`http://localhost:8000/login`, {
+                    .post(`http://0.0.0.0:8000/login`, {
                         username: data.username,
                         password: data.password,
                     })
@@ -68,7 +68,7 @@
             }
         } else {
             await axios
-                .post(`http://localhost:8000/user`, {
+                .post(`http://0.0.0.0:8000/user`, {
                     username: data.username,
                     password: data.password,
                     teamID: data.teamID,
@@ -99,7 +99,7 @@
 
         let userID = data.userID;
 
-        await axios.get(`http://localhost:8000/user/${userID}`).then((res) => {
+        await axios.get(`http://0.0.0.0:8000/user/${userID}`).then((res) => {
             let userData = res.data;
             userTable = [
                 "User",
@@ -112,7 +112,7 @@
             ];
         });
         await axios
-            .get(`http://localhost:8000/team/user/${userID}`)
+            .get(`http://0.0.0.0:8000/team/user/${userID}`)
             .then((res) => {
                 let teamData = res.data;
                 teamTable = [
@@ -124,7 +124,7 @@
                 ];
             });
         await axios
-            .get(`http://localhost:8000/user/${userID}/timesheet/summary`)
+            .get(`http://0.0.0.0:8000/user/${userID}/timesheet/summary`)
             .then((res) => {
                 let timesheetData = res.data;
                 let times = timesheetData.times;

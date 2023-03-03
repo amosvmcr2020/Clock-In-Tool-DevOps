@@ -17,7 +17,7 @@
 
     const get_teams = async () => {
         await axios
-            .get(`http://localhost:8000/team`)
+            .get(`http://0.0.0.0:8000/team`)
             .then((res) => (team_list = res.data));
         team_list = team_list;
     };
@@ -34,7 +34,7 @@
         if (login) {
             try {
                 await axios
-                    .post(`http://localhost:8000/login`, {
+                    .post(`http://0.0.0.0:8000/login`, {
                         username: data.username,
                         password: data.password,
                     })
@@ -53,7 +53,7 @@
         } else {
             try {
                 await axios
-                    .post(`http://localhost:8000/user`, {
+                    .post(`http://0.0.0.0:8000/user`, {
                         username: data.username,
                         password: data.password,
                         teamID: data.teamID,
