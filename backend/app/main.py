@@ -12,7 +12,7 @@ import time
 app = FastAPI(title="Clock In API")
 
 origins = [
-    "http://0.0.0.0:8000",
+    "http://0.0.0.0:8080",
 ]
 
 methods = ["GET", "POST", "PATCH", "DELETE"]
@@ -22,6 +22,7 @@ app.add_middleware(
     allow_origins=origins,
     allow_methods=methods,
     allow_credentials=True,
+    allow_headers=["*"],
 )
 
 
