@@ -2,30 +2,33 @@
 
 ## About the application
 
-This application has been developed to record the 'clock-in' and 'clock-out' times of the users and to identify who is online at any given time in a list of teams. 
+This application has been developed to record the 'clock-in' and 'clock-out' times of the users and to identify who is online at any given time in a list of teams.
 
-The application consists of 4 database tables which are as follows: 
+The application consists of 4 database tables which are as follows:
+
 - Users
 - Teams
 - Timesheets
 - Entries
 
-An interactive diagram of the tables can be found in the frontend of the application when logged in as any user. 
+An interactive diagram of the tables can be found in the frontend of the application when logged in as any user.
 
 ## Running the app using Docker
 
-The application has been dockerised so that it is easy for the user to run and so that it is easy to host on a cloud platform, should this be considered. 
+The application has been dockerised so that it is easy for the user to run and so that it is easy to host on a cloud platform, should this be considered.
 
-In each of the backend and frontend directories is a `Dockerfile` which defines how docker should build each aspect of the app. In the root directory there is a `docker-compose.yaml` file which defines how to build and run the entire application using only one command: 
+In each of the backend and frontend directories is a `Dockerfile` which defines how docker should build each aspect of the app. In the root directory there is a `docker-compose.yaml` file which defines how to build and run the entire application using only one command:
+
 - `docker-compose up --build`
 
-Within the `docker-compose.yaml` there is also a database service which starts a postgres image and sets the appropriate environment variables for the backend to link up to it. 
+Within the `docker-compose.yaml` there is also a database service which starts a postgres image and sets the appropriate environment variables for the backend to link up to it.
 
 ## About the CI/CD Pipeline
 
-This application is source controlled using git and pushed to a repository on github. Within github there is a feature called "github actions" which enables the user to define a collection of steps to run whenever new code is pushed or merged in the repository. 
+This application is source controlled using git and pushed to a repository on github. Within github there is a feature called "github actions" which enables the user to define a collection of steps to run whenever new code is pushed or merged in the repository.
 
-These actions can be found in the `.github/workflows/app.yaml` file, where a series of jobs have been defined. These jobs include the following: 
+These actions can be found in the `.github/workflows/app.yaml` file, where a series of jobs have been defined. These jobs include the following:
+
 - Prettier
   - Runs prettier code formatting on all the frontend js files.
 - Black
@@ -33,9 +36,9 @@ These actions can be found in the `.github/workflows/app.yaml` file, where a ser
 - Python Autoflake
   - Removes all unused variables on the backend .
 - NPMAudit
-  - Runs npm audit on the frontend to scan for any vulnerabilities and notify the user. 
+  - Runs npm audit on the frontend to scan for any vulnerabilities and notify the user.
 - Pytest
-  - Runs all of the tests on the backend and fails the run if any tests fail. 
+  - Runs all of the tests on the backend and fails the run if any tests fail.
 - PipUpgrade
   - Runs pip-upgrade on the backend to ensure no outdated dependencies are being used, otherwise the build fails.
 - DockerUI
@@ -43,7 +46,8 @@ These actions can be found in the `.github/workflows/app.yaml` file, where a ser
 - DockerAPI
   - Build the backend docker image and pushes it to the github image repository.
 
-From the repository, all CI/CD pipeline runs can be found under the 'actions' tab in github. 
+From the repository, all CI/CD pipeline runs can be found under the 'actions' tab in github.
+
 ## About the backend
 
 The backend has been written using FastAPI, a Python framework for creating restful applications. FastAPI was chosen due to its vast documentation alogside the automatically generated docs for the API itself. Once running, these are available at the "/docs" or the "/redoc" endpoint of the api. For example:
@@ -66,7 +70,7 @@ The backend is tested using the pytest framework. Pytest can be used to write a 
 
 Within the test file, the `create_test_db.py` script is run. This script, similarly to the `create_db.py` script, drops all existing tables and creates the four new ones populated by 2 teams, colectively containing 3 users. Each user has a timesheet allocated to them and the Administrator has 3 entries added to their timesheet.
 
-Currently, this is run in the `main.py` folder as well in order to generate some test data whenever the application is run. Naturally, this would not be the case should this application be used in production as it would overwrite all previous data. 
+Currently, this is run in the `main.py` folder as well in order to generate some test data whenever the application is run. Naturally, this would not be the case should this application be used in production as it would overwrite all previous data.
 
 ## Running the backend independently
 
@@ -94,7 +98,7 @@ The frontend is written using the Svelte framework, a javascript framework that 
 
 The frontend provides an easy to digest user interface, from which the user can trigger and visualise the majority of the available API endpoints. The user also has access to a "database" page which allows the user to clearly view the database structure, as well as an overview of the data within each table. Additionally, from the "user" page, the user can view all stored data relevant to that user, in the same format.
 
-## Running the frontend independently 
+## Running the frontend independently
 
 ### All of the following should be done from the frontend:
 
