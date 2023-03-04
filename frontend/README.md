@@ -1,6 +1,8 @@
 # The frontend
+
 ## Running the frontend independently
-*All of the following should be done from the frontend directory*
+
+_All of the following should be done from the frontend directory_
 
 `cd frontend`
 

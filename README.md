@@ -16,11 +16,12 @@ An interactive diagram of the tables can be found in the frontend of the applica
 ## Application Technology Stack
 
 This application is build using the following technologies:
+
 - Backend
   - Python FastAPI which can be served using a `uvicorn` server.
   - Postgres SQL relational database.
 - Frontend
-  - SvelteJS frontend framework 
+  - SvelteJS frontend framework
 
 ## Running the app using Docker
 
