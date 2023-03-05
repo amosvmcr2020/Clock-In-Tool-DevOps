@@ -137,6 +137,21 @@ jobs:
         run: pip install pip-upgrader
       - name: Run pip-upgrade
         run: pip-upgrade --skip-virtualenv-check
+  PipAudit:
+    defaults:
+      run:
+        working-directory: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: install
+        run: |
+          python -m venv env/
+          source env/bin/activate
+          python -m pip install .
+      - uses: pypa/gh-action-pip-audit@v1.0.6
+        with:
+          virtual-environment: env/
   DockerUI:
     defaults:
       run:
