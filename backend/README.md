@@ -1,7 +1,8 @@
-# The Backend 
+# The Backend
+
 ## Running the backend independently
 
-*All of the following should be done from the backend directory*
+_All of the following should be done from the backend directory_
 
 `cd backend`
 
