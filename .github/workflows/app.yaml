@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Prettify code
-        uses: creyD/prettier_action@v4.2
+        uses: creyD/prettier_action@v4.3
         with:
           prettier_options: --write **/*.{js,md}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -112,7 +112,49 @@ jobs:
       - name: Run Tests
         working-directory: ./backend
         run: pytest
-
+  PipUpgrade:
+    defaults:
+      run:
+        working-directory: backend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest pytest-cov
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Install pip-upgrader
+        run: pip install pip-upgrader
+      - name: Run pip-upgrade
+        run: pip-upgrade --skip-virtualenv-check
+  PipAudit:
+    defaults:
+      run:
+        working-directory: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest pytest-cov
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - uses: pypa/gh-action-pip-audit@v1.0.6
   DockerUI:
     defaults:
       run:

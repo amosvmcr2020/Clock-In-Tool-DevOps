@@ -1,7 +1,7 @@
 import hashlib
 
 from datetime import datetime
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
@@ -10,14 +10,16 @@ from . import schemas, database, models, create_test_db
 app = FastAPI(title="Clock In API")
 
 origins = [
-    "http://0.0.0.0:8080",
+    "http://0.0.0.0:8000",
 ]
+
+methods = ["GET", "POST", "PATCH", "DELETE"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_methods=methods,
     allow_credentials=True,
-    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -34,6 +36,15 @@ def hashFunc(password):
 def checkAdmin(userID):
     user = db.query(models.User).filter(models.User.id == userID).first()
     return user.hasAdmin
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    response = await call_next(request)
+    origin = response.headers.get("access-control-allow-origin")
+    if origin != None:
+        print(f"CORS has rejected a request from the origin: {origin}")
+    return response
 
 
 @app.get("/")
