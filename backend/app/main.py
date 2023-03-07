@@ -83,16 +83,13 @@ def create_user(user: schemas.UserIn):
             status_code=status.HTTP_400_BAD_REQUEST, detail="Password cannot be empty"
         )
     check_user = (
-        db.query(models.User).filter(
-            models.User.username == user.username).first()
+        db.query(models.User).filter(models.User.username == user.username).first()
     )
-    check_team = db.query(models.Team).filter(
-        models.Team.id == user.teamID).first()
+    check_team = db.query(models.Team).filter(models.Team.id == user.teamID).first()
 
     # If username in use, reject.
     if check_user is not None:
-        raise HTTPException(
-            status_code=400, detail="This username is already in use.")
+        raise HTTPException(status_code=400, detail="This username is already in use.")
 
     # If team id does not exist.
     if check_team is None:
@@ -130,8 +127,7 @@ def get_user_timesheet(user_id: int):
         )
 
     timesheet = (
-        db.query(models.Timesheet).filter(
-            models.Timesheet.owner == user).first()
+        db.query(models.Timesheet).filter(models.Timesheet.owner == user).first()
     )
     if timesheet is None:
         # If the user doesn't have a timesheet, create one.
@@ -156,8 +152,7 @@ def get_user_timesheet_summary(user_id: int):
         )
 
     timesheet = (
-        db.query(models.Timesheet).filter(
-            models.Timesheet.owner == user).first()
+        db.query(models.Timesheet).filter(models.Timesheet.owner == user).first()
     )
     if timesheet is None:
         raise HTTPException(
@@ -174,8 +169,7 @@ def get_user_timesheet_summary(user_id: int):
 def update_user(user_id: int, new_user: schemas.User):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     check_user = (
-        db.query(models.User).filter(
-            models.User.username == new_user.username).first()
+        db.query(models.User).filter(models.User.username == new_user.username).first()
     )
     if check_user is not None and check_user is not user:
         raise HTTPException(
@@ -207,8 +201,7 @@ def delete_user(user_id: int, authUserID: int):
         raise HTTPException(status_code=404, detail="User does not exist.")
 
     timesheet = (
-        db.query(models.Timesheet).filter(
-            models.Timesheet.owner == user).first()
+        db.query(models.Timesheet).filter(models.Timesheet.owner == user).first()
     )
 
     db.delete(timesheet)
@@ -228,8 +221,7 @@ def check_online(user_id):
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
         )
     timesheet = (
-        db.query(models.Timesheet).filter(
-            models.Timesheet.owner == user).first()
+        db.query(models.Timesheet).filter(models.Timesheet.owner == user).first()
     )
     date = datetime.now().strftime("%x")
     entry = (
@@ -248,8 +240,7 @@ def check_online(user_id):
 @app.post("/login", status_code=status.HTTP_200_OK)
 def user_login(user: schemas.UserLogin):
     check_user = (
-        db.query(models.User).filter(
-            models.User.username == user.username).first()
+        db.query(models.User).filter(models.User.username == user.username).first()
     )
     if check_user is None:
         raise HTTPException(
@@ -295,13 +286,11 @@ def create_team(team: schemas.Team):
         )
 
     check_team = (
-        db.query(models.Team).filter(
-            models.Team.teamname == team.teamname).first()
+        db.query(models.Team).filter(models.Team.teamname == team.teamname).first()
     )
     # Ensure teamname is not in use
     if check_team is not None:
-        raise HTTPException(
-            status_code=400, detail="This team already exists.")
+        raise HTTPException(status_code=400, detail="This team already exists.")
 
     new_team = models.Team(teamname=team.teamname)
 
@@ -342,8 +331,7 @@ def update_team(team_id: int, new_team: schemas.Team):
         )
     # Ensure the teamname is not already in use
     check_team = (
-        db.query(models.Team).filter(
-            models.Team.teamname == new_team.teamname).first()
+        db.query(models.Team).filter(models.Team.teamname == new_team.teamname).first()
     )
     if check_team is not None and check_team is not team:
         raise HTTPException(
@@ -403,8 +391,7 @@ def get_timesheets():
 @app.get("/timesheet/{timesheet_id}", response_model=schemas.Timesheet)
 def get_timesheet(timesheet_id: int):
     timesheet = (
-        db.query(models.Timesheet).filter(
-            models.Timesheet.id == timesheet_id).first()
+        db.query(models.Timesheet).filter(models.Timesheet.id == timesheet_id).first()
     )
     if timesheet is None:
         raise HTTPException(
@@ -453,8 +440,7 @@ def delete_timesheet(timesheet_id: int, authUserID: int):
             detail="You must have admin priveledges to do this.",
         )
     timesheet = (
-        db.query(models.Timesheet).filter(
-            models.Timesheet.id == timesheet_id).first()
+        db.query(models.Timesheet).filter(models.Timesheet.id == timesheet_id).first()
     )
     if timesheet is None:
         raise HTTPException(
@@ -478,8 +464,7 @@ def clear_timesheet(timesheet_id: int, authUserID: int):
             detail="You must have admin priveledges to do this.",
         )
     entries = (
-        db.query(models.Entry).filter(
-            models.Entry.timesheetID == timesheet_id).all()
+        db.query(models.Entry).filter(models.Entry.timesheetID == timesheet_id).all()
     )
     print(entries)
     for entry in entries:
