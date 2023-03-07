@@ -7,12 +7,10 @@ from typing import List
 
 from . import schemas, database, models, create_test_db
 
-import time
-
 app = FastAPI(title="Clock In API")
 
 origins = [
-    "http://0.0.0.0:8080",
+    "http://0.0.0.0:8000",
 ]
 
 methods = ["GET", "POST", "PATCH", "DELETE"]
@@ -42,11 +40,10 @@ def checkAdmin(userID):
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    start_time = time.time()
     response = await call_next(request)
-    process_time = time.time() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    print(process_time)
+    origin = response.headers.get("access-control-allow-origin")
+    if origin != None:
+        print(f"CORS has rejected a request from the origin: {origin}")
     return response
 
 

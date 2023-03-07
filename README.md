@@ -25,8 +25,6 @@ This application is build using the following technologies:
 
 ## Running the app using Docker
 
-The application has been dockerised so that it is easy for the user to run and so that it is easy to host on a cloud platform, should this be considered.
-
 In each of the backend and frontend directories is a `Dockerfile` which defines how docker should build each aspect of the app. In the root directory there is a `docker-compose.yaml` file which defines how to build and run the entire application using only one command:
 
 - `docker-compose up --build`
@@ -34,31 +32,6 @@ In each of the backend and frontend directories is a `Dockerfile` which defines 
 Within the `docker-compose.yaml` there is also a database service which starts a postgres image and sets the appropriate environment variables for the backend to link up to it.
 
 There is more information on how to run each aspect of the app individually in the `frontend` and `backend` readme files.
-
-## About the CI/CD Pipeline
-
-This application is source controlled using git and pushed to a repository on github. Within github there is a feature called "github actions" which enables the user to define a collection of steps to run whenever new code is pushed or merged in the repository.
-
-These actions can be found in the `.github/workflows/app.yaml` file, where a series of jobs have been defined. These jobs include the following:
-
-- Prettier
-  - Runs prettier code formatting on all the frontend js files.
-- Black
-  - Runs black code formatting on all the backend python files.
-- Python Autoflake
-  - Removes all unused variables on the backend .
-- NPMAudit
-  - Runs npm audit on the frontend to scan for any vulnerabilities and notify the user.
-- Pytest
-  - Runs all of the tests on the backend and fails the run if any tests fail.
-- PipUpgrade
-  - Runs pip-upgrade on the backend to ensure no outdated dependencies are being used, otherwise the build fails.
-- DockerUI
-  - Build the frontend docker image and pushes it to the github image repository.
-- DockerAPI
-  - Build the backend docker image and pushes it to the github image repository.
-
-From the repository, all CI/CD pipeline runs can be found under the 'actions' tab in github.
 
 ## The Backend
 
@@ -84,8 +57,3 @@ Within the test file, the `create_test_db.py` script is run. This script, simila
 
 Currently, this is run in the `main.py` folder as well in order to generate some test data whenever the application is run. Naturally, this would not be the case should this application be used in production as it would overwrite all previous data.
 
-## The frontend
-
-The frontend is written using the Svelte framework, a javascript framework that assists the developer in building user interfaces. The frontned calls out to the API using the `axios` package, which allows the developer to easily make a range of api calls with a low, readable amount of syntax.
-
-The frontend provides an easy to digest user interface, from which the user can trigger and visualise the majority of the available API endpoints. The user also has access to a "database" page which allows the user to clearly view the database structure, as well as an overview of the data within each table. Additionally, from the "user" page, the user can view all stored data relevant to that user, in the same format.
