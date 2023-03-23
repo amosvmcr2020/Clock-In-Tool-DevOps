@@ -56,4 +56,3 @@ The backend is tested using the pytest framework. Pytest can be used to write a 
 Within the test file, the `create_test_db.py` script is run. This script, similarly to the `create_db.py` script, drops all existing tables and creates the four new ones populated by 2 teams, colectively containing 3 users. Each user has a timesheet allocated to them and the Administrator has 3 entries added to their timesheet.
 
 Currently, this is run in the `main.py` folder as well in order to generate some test data whenever the application is run. Naturally, this would not be the case should this application be used in production as it would overwrite all previous data.
-
