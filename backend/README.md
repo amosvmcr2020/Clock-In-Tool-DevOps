@@ -18,4 +18,5 @@ _All of the following should be done from the backend directory_
 - Running the API:
   `uvicorn app.main:app --reload`
 - Test the app:
-  `pytest`
+  - Ensure that line 7 in `app/config.py` is uncommented
+  - `pytest`
